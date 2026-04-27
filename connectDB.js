@@ -28,7 +28,7 @@ async function runTest() {
     let pool = await sql.connect(config);
     console.log("✅ Connected to MS SQL in Docker!");
 
-    let result = await pool.request().query("SELECT * FROM Entities");
+    let result = await pool.request().query("SELECT TOP 1 * FROM Entities");
     console.dir(result.recordset); // .recordset gives you the actual data rows
 
     await sql.close();

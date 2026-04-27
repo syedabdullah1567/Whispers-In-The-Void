@@ -4,7 +4,8 @@
   "description": "Three dingus', absolute chaos.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "connect": "node connectDB.js"
   },
   "repository": {
     "type": "git",
