@@ -22,11 +22,11 @@ INSERT INTO Entities (true_name, entity_species, terror_index, existence_state, 
 ('Morana Echo', 'Lich', 5, 'neutralized', 4, 1),
 ('Whisper-in-Walls', 'Poltergeist', 3, 'active', 2, 2);
 
-INSERT INTO Artifacts (artifact_name, artifact_type, origin, location_id, isFound) VALUES 
-('Sun-Forged Blade', 'Weapon', 'Solar Forge', 5, 0),
-('Cloak of Displacement', 'Charm', 'Elven Realm', 1, 0),
-('Codex Gigas', 'Tome', 'Monastery', 3, 0),
-('Eye of Horus', 'Relic', 'Ancient Egypt', 2, 0);
+INSERT INTO Artifacts (artifact_name, artifact_type, origin, location_id) VALUES 
+('Sun-Forged Blade', 'Weapon', 'Solar Forge', 5),
+('Cloak of Displacement', 'Charm', 'Elven Realm', 1),
+('Codex Gigas', 'Tome', 'Monastery', 3),
+('Eye of Horus', 'Relic', 'Ancient Egypt', 2);
 
 INSERT INTO Weaknesses (weakness_name, description, entity_type, artifact_id) VALUES 
 ('Holy Water Burn', 'Concentrated holy water causes acidic reactions.', 'Vampire', 3),
@@ -38,10 +38,10 @@ INSERT INTO Abilities (ability_name, description, artifact_id) VALUES
 ('True Sight', 'Reveals invisible or phased entities.', 2),
 ('Flame Burst', 'Engulfs the weapon in holy fire.', 4);
 
-INSERT INTO Hunters (hunter_name, rank, specialization, faction) VALUES 
-('Zane Miller', 'Rookie', 'Tracking', 'Vanguard'), 
-('Elena Vance', 'Elite', 'Pyromancy', 'The Silent Order'), 
-('Kaelen Highwind', 'Master', 'Sealing Arts', 'Independent');
+INSERT INTO Hunters (hunter_name, rank, type, faction) VALUES 
+('Zane Miller', 'Rookie', 'Scout', 'Vanguard'), 
+('Elena Vance', 'Elite', 'Collector', 'The Silent Order'), 
+('Kaelen Highwind', 'Master', 'Attacker', 'Independent');
 
 INSERT INTO Hunter_Abilities (hunter_id, ability_id, unlock_date) VALUES 
 (1, 2, '2026-01-15'),

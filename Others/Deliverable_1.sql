@@ -45,8 +45,9 @@ CREATE TABLE Hunters (
     hunter_id INT IDENTITY(1,1) PRIMARY KEY,
     hunter_name VARCHAR(100) NOT NULL,
     rank VARCHAR(50) NOT NULL,
-    specialization VARCHAR(100),
-    faction VARCHAR(100)
+    type VARCHAR(20) NOT NULL,
+    faction VARCHAR(100),
+    CONSTRAINT CHK_HunterType CHECK (type IN ('Scout', 'Collector', 'Attacker'))
 );
 
 CREATE TABLE Artifacts (
@@ -55,7 +56,8 @@ CREATE TABLE Artifacts (
     artifact_type VARCHAR(50),
     origin VARCHAR(100),
     location_id INT,
-    isFound BIT,
+    status VARCHAR(20) NOT NULL DEFAULT 'Unlocated',
+    CONSTRAINT CHK_ArtifactState CHECK (status IN ('Unlocated', 'Active', 'Used')),
     FOREIGN KEY (location_id)
         REFERENCES Locations(location_id)
         ON DELETE SET NULL
