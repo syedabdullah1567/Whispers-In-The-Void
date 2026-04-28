@@ -13,7 +13,7 @@ app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 app.get("/api/hunters", async(req, res) => {
     try{
         const pool = await poolPromise;
-        const result = await pool.request().query("SELECT TOP 10 * FROM Hunters");
+        const result = await pool.request().query("SELECT * FROM Hunters");
         //console.log(result);
 
         res.status(200).json({
