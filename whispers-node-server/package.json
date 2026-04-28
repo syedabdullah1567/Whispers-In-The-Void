@@ -1,0 +1,28 @@
+{
+  "name": "whispers-in-the-void",
+  "version": "1.0.0",
+  "description": "Three dingus', absolute chaos.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "connect": "node connectDB.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syedabdullah1567/Whispers-In-The-Void.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/syedabdullah1567/Whispers-In-The-Void/issues"
+  },
+  "homepage": "https://github.com/syedabdullah1567/Whispers-In-The-Void#readme",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mssql": "^12.5.0"
+  }
+}
