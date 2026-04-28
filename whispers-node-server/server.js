@@ -31,6 +31,19 @@ app.get("/api/hunters", async(req, res) => {
     }
 });
 
+app.get("/api/locations", async(req, res) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request().query("SELECT * FROM Locations");
+        res.status(200).json({
+            success: true,
+            locationData: result.recordset
+        });
+    } catch(error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 app.post("/api/authorize", async (req, res) => {
     const { hunterId, locationId } = req.body;
 
@@ -40,16 +53,13 @@ app.post("/api/authorize", async (req, res) => {
     try {
         const pool = await poolPromise;
         const result = await pool.request()
-            // Define input parameters
             .input('HunterID', sql.Int, hunterId)
             .input('LocationID', sql.Int, locationId)
-            // Define output parameters (matching your SQL data types)
+            .input('OperationType', sql.VarChar, req.body.operationType)
             .output('IsAuthorized', sql.Bit)
             .output('Message', sql.VarChar(255))
-            // Execute the procedure
             .execute('AuthorizeOperation');
 
-        // Accessing the output values from the result object
         const isAuthorized = result.output.IsAuthorized;
         const message = result.output.Message;
 
