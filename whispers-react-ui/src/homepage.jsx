@@ -1,98 +1,192 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Homepage = () => {
     const navigate = useNavigate();
+    const audioRef = useRef(null);
+
+    // Function to start audio (triggered by the container click or hover)
+    const startAmbience = () => {
+        if (audioRef.current) {
+            audioRef.current.volume = 0.4;
+            audioRef.current.play().catch(e => console.log("Audio waiting for interaction"));
+        }
+    };
 
     return (
-        <div className="homepage-container bg-black text-danger d-flex align-items-center justify-content-center vh-100">
-            {/* Scanned Line Overlay Effect */}
+        <div 
+            className="horror-root" 
+            onClick={startAmbience}
+            onMouseEnter={startAmbience}
+        >
+            {/* BACKGROUND AUDIO BOILERPLATE */}
+            {/* Place your .mp3 file in the 'public/assets/audio/' folder */}
+            <audio 
+                ref={audioRef} 
+                src="/assets/audio/void_ambience.mp3" 
+                loop 
+            />
+
+            <div className="vignette"></div>
             <div className="scanlines"></div>
 
-            <div className="text-center p-5 border border-danger shadow-lg bg-dark bg-opacity-25" style={{maxWidth: '800px', zIndex: 1}}>
-                <h1 className="display-1 fw-bold mb-0 tracking-tighter">WHISPERS</h1>
-                <h2 className="display-6 mb-4 text-uppercase opacity-75">In The Void</h2>
+            <div className="terminal-frame">
+                <div className="header-section">
+                    <h1 className="main-title">WHISPERS</h1>
+                    <h2 className="sub-title">IN THE VOID</h2>
+                </div>
                 
-                <hr className="border-danger opacity-50" />
-                
-                <div className="mb-5 font-monospace text-start" style={{ fontSize: '0.85rem', lineHeight: '1.6' }}>
-                    {/* System Status Block */}
-                    <div className="mb-4 p-2 border-start border-danger" style={{ backgroundColor: 'rgba(255, 0, 0, 0.05)' }}>
-                        <p className="mb-1 text-uppercase fw-bold" style={{ color: '#ff4d4d', letterSpacing: '2px' }}>
-                            [LOG_RECOVERY_FAIL: 28.04.2026]
-                        </p>
-                        <p className="mb-0 text-white opacity-75">
-                            SIGNAL: <span className="glitch-text">PULSE DETECTED IN VACUUM</span><br />
+                <div className="content-body">
+                    {/* System Log Block */}
+                    <div className="log-block">
+                        <p className="log-header">[LOG_RECOVERY_FAIL: 30.04.2026]</p>
+                        <p className="log-text">
+                            SIGNAL: <span className="glitch-text">PULSE_DETECTED_IN_VACUUM</span><br />
                             ARCHIVE: <span className="text-danger">94% CORRUPTED</span><br />
-                            MORALE: <span className="text-decoration-line-through">EXTINGUISHED</span>
+                            MORALE: <span className="strikethrough">EXTINGUISHED</span>
                         </p>
                     </div>
 
-                    {/* The Cryptic Warning */}
-                    <div className="ps-3" style={{ borderLeft: '1px solid #444' }}>
-                        <p className="mb-2 text-danger fw-bold italic" style={{fontSize: '0.75rem'}}>REDACTED DIRECTIVE 0-00:</p>
-                        <p className="text-muted mb-1" style={{ fontSize: '0.8rem' }}>
-                            If an asset returns with a different voice, <span className="text-white">do not open the airlock.</span>
+                    {/* The Warning */}
+                    <div className="warning-box">
+                        <p className="warning-label">REDACTED DIRECTIVE 0-00:</p>
+                        <p className="warning-text">
+                            If an asset returns with a different voice, <span className="highlight">do not open the airlock.</span>
                         </p>
-                        <p className="text-muted" style={{ fontSize: '0.8rem' }}>
-                            The void does not mimic; <span className="text-danger font-weight-bold">it replaces.</span> 
+                        <p className="warning-text footer-note">
+                            The void does not mimic; <span className="blood-text">it replaces.</span> 
                             Selection is merely an act of sacrifice.
                         </p>
                     </div>
                 </div>
 
-                <button 
-                    className="btn btn-outline-danger btn-lg px-5 py-3 text-uppercase fw-bold"
-                    onClick={() => navigate('/initialize')}
-                    style={{letterSpacing: '5px', transition: '0.3s'}}
-                    onMouseOver={(e) => e.target.style.boxShadow = '0 0 20px #ff0000'}
-                    onMouseOut={(e) => e.target.style.boxShadow = 'none'}
-                >
-                    Initialize Selection
-                </button>
+                <div className="action-area">
+                    <button 
+                        className="init-button"
+                        onClick={() => navigate('/initialize')}
+                    >
+                        INITIALIZE SELECTION
+                    </button>
+                    <div className="button-glitch"></div>
+                </div>
             </div>
 
             <style>{`
-                @keyframes flicker {
-                    0% { opacity: 0.9; }
-                    5% { opacity: 0.8; }
-                    10% { opacity: 0.9; }
-                    100% { opacity: 1; }
-                }
-                @keyframes glitch {
-                    0% { transform: translate(0); text-shadow: -2px 0 red, 2px 0 blue; }
-                    20% { transform: translate(-2px, 2px); }
-                    40% { transform: translate(-2px, -2px); text-shadow: 2px 0 red, -2px 0 blue; }
-                    60% { transform: translate(2px, 2px); }
-                    80% { transform: translate(2px, -2px); }
-                    100% { transform: translate(0); }
-                }
-                .glitch-text {
-                    display: inline-block;
-                    animation: glitch 1.5s linear infinite;
-                    color: #fff;
-                }
-                .homepage-container {
-                    animation: flicker 0.1s infinite;
-                    font-family: 'Courier New', Courier, monospace;
+                .horror-root {
+                    background: #000;
+                    color: #ff4d4d;
+                    height: 100vh;
+                    width: 100vw;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: 'JetBrains Mono', 'Courier New', monospace;
                     overflow: hidden;
                     position: relative;
                 }
+
+                /* Deep shadows on edges */
+                .vignette {
+                    position: absolute;
+                    inset: 0;
+                    background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.9) 100%);
+                    z-index: 2;
+                    pointer-events: none;
+                }
+
+                .terminal-frame {
+                    width: 90%;
+                    max-width: 700px;
+                    border: 1px solid #300;
+                    padding: 40px;
+                    background: rgba(10, 0, 0, 0.8);
+                    z-index: 3;
+                    position: relative;
+                    box-shadow: 0 0 40px rgba(255, 0, 0, 0.05);
+                }
+
+                .main-title {
+                    font-size: 5rem;
+                    font-weight: 900;
+                    margin: 0;
+                    letter-spacing: -5px;
+                    text-shadow: 3px 0px 0px rgba(255, 0, 0, 0.4);
+                    animation: drift 5s infinite ease-in-out;
+                }
+
+                .sub-title {
+                    font-size: 1.2rem;
+                    letter-spacing: 12px;
+                    opacity: 0.5;
+                    margin-top: -10px;
+                    margin-bottom: 40px;
+                }
+
+                .log-block {
+                    border-left: 2px solid #ff4d4d;
+                    padding-left: 20px;
+                    margin-bottom: 30px;
+                }
+
+                .log-header { font-size: 0.7rem; font-weight: bold; margin-bottom: 5px; }
+                .log-text { color: #aaa; font-size: 0.9rem; line-height: 1.4; }
+                .strikethrough { text-decoration: line-through; opacity: 0.4; }
+
+                .warning-box {
+                    background: rgba(255, 0, 0, 0.03);
+                    padding: 15px;
+                    border: 1px solid rgba(255, 0, 0, 0.1);
+                }
+
+                .warning-label { font-size: 0.65rem; color: #600; margin-bottom: 8px; }
+                .warning-text { color: #888; font-size: 0.85rem; font-style: italic; }
+                .highlight { color: #eee; }
+                .blood-text { color: #ff0000; font-weight: bold; text-shadow: 0 0 5px red; }
+
+                .init-button {
+                    background: transparent;
+                    border: 1px solid #ff4d4d;
+                    color: #ff4d4d;
+                    padding: 15px 40px;
+                    font-size: 1rem;
+                    font-weight: bold;
+                    letter-spacing: 4px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    margin-top: 40px;
+                    width: 100%;
+                }
+
+                .init-button:hover {
+                    background: #ff4d4d;
+                    color: #000;
+                    box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
+                }
+
+                /* Animations */
+                @keyframes drift {
+                    0%, 100% { transform: translateX(0); }
+                    50% { transform: translateX(5px); }
+                }
+
                 .scanlines {
                     position: absolute;
-                    top: 0; left: 0; width: 100%; height: 100%;
-                    background: linear-gradient(
-                        rgba(18, 16, 16, 0) 50%, 
-                        rgba(0, 0, 0, 0.25) 50%
-                    ), linear-gradient(
-                        90deg, 
-                        rgba(255, 0, 0, 0.06), 
-                        rgba(0, 255, 0, 0.02), 
-                        rgba(0, 0, 255, 0.06)
-                    );
-                    background-size: 100% 4px, 3px 100%;
+                    inset: 0;
+                    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+                    background-size: 100% 4px;
+                    z-index: 4;
                     pointer-events: none;
+                    opacity: 0.3;
+                }
+
+                .glitch-text {
+                    animation: glitch 2s infinite;
+                }
+
+                @keyframes glitch {
+                    0% { transform: skew(0deg); }
+                    2% { transform: skew(10deg); color: #fff; }
+                    4% { transform: skew(0deg); }
                 }
             `}</style>
         </div>
