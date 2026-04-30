@@ -37,6 +37,7 @@ export default function App() {
         <Route path="/bloodlines" element={<DashboardLayout><Bloodlines /></DashboardLayout>} />
         <Route path="/weaknesses" element={<DashboardLayout><WeaknessIntel /></DashboardLayout>} />
         <Route path="/hunters" element={<DashboardLayout><Hunters /></DashboardLayout>} />
+        <Route path="/locations" element={<DashboardLayout><Locations /></DashboardLayout>} />
         {/* <Route path="/hunters" element={<DashboardLayout><Hunters viewOnly={true} /></DashboardLayout>} /> */}
 
         {/* --- FIELD TERMINAL / GAME LOOP (Horror UI) --- */}
