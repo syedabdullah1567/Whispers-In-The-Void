@@ -8,9 +8,10 @@ import Authorize from './authorize';       // Removed /pages/
 import AuthSequence from './AuthSequence';
 import HunterSelection from './HunterSelection';
 import LocationSelection from './LocationSelection';
+import Bloodlines from './bloodlines';
 import {
   EntityRegistry, ArtifactVault,
-  OpsLog, Bloodlines,
+  OpsLog,
   WeaknessIntel,
 } from './stubs'; // Removed /pages/
 import './App.css';
@@ -38,7 +39,6 @@ export default function App() {
         <Route path="/weaknesses" element={<DashboardLayout><WeaknessIntel /></DashboardLayout>} />
         <Route path="/hunters" element={<DashboardLayout><Hunters /></DashboardLayout>} />
         <Route path="/locations" element={<DashboardLayout><Locations /></DashboardLayout>} />
-        {/* <Route path="/hunters" element={<DashboardLayout><Hunters viewOnly={true} /></DashboardLayout>} /> */}
 
         {/* --- FIELD TERMINAL / GAME LOOP (Horror UI) --- */}
         {/* We enter this 'mode' via the Send Operation button */}

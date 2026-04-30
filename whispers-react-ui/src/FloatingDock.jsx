@@ -14,6 +14,7 @@ const navItems = [
       </svg>
     ),
   },
+  { divider: true },
   {
     to: '/hunters',
     label: 'Hunter Roster',

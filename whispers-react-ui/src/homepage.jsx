@@ -23,7 +23,7 @@ const Homepage = () => {
             {/* Place your .mp3 file in the 'public/assets/audio/' folder */}
             <audio 
                 ref={audioRef} 
-                src="/assets/audio/void_ambience.mp3" 
+                src="./castlevania.mp3" 
                 loop 
             />
 

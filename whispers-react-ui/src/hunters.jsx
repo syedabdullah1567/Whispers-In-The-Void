@@ -68,7 +68,7 @@ const Hunters = () => {
                                 {h.hunter_name}
                             </div>
                             <div className="stat-lbl" style={{ marginTop: '2px', color: '#555' }}>
-                                {h.type} // SECTOR_OP
+                                {h.type}
                             </div>
                         </div>
 

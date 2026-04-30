@@ -103,8 +103,14 @@ const Authorize = () => {
                         <div className={`result-screen ${authResult.authorized ? 'granted' : 'denied'}`}>
                             <h2>{authResult.authorized ? ">>> ACCESS GRANTED" : ">>> ACCESS DENIED"}</h2>
                             <p>{authResult.message}</p>
-                            <button className="terminal-btn mt-20" onClick={() => navigate("/dashboard")}>
-                                {authResult.authorized ? "PROCEED TO COMMAND" : "RETURN TO ROSTER"}
+    
+                            <button 
+                            className="terminal-btn mt-20" 
+                            onClick={() => {
+                            if (authResult.authorized) {
+                                navigate("/");
+                            } else {navigate("/hunter-select");}}}>
+                            {authResult.authorized ? "PROCEED TO COMMAND" : "RE-EVALUATE ASSET"}
                             </button>
                         </div>
                     )}

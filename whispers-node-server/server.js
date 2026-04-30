@@ -44,6 +44,19 @@ app.get("/api/locations", async(req, res) => {
     }
 });
 
+app.get("/api/bloodlines", async(req, res) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request().query("SELECT * FROM Bloodlines");
+        res.status(200).json({
+            success: true,
+            bloodlineData: result.recordset
+        });
+    } catch(error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 app.post("/api/authorize", async (req, res) => {
     const { hunterId, locationId } = req.body;
 
