@@ -1,10 +1,11 @@
-import './App.css'
+import React from 'react';
+import './App.css';
 
 const stats = [
-  { val: 7,  lbl: 'Entities on record',   sub: '4 still active',    subColor: '#a32d2d' },
-  { val: 5,  lbl: 'Operations logged',    sub: 'this cycle',         subColor: '#888780' },
-  { val: 3,  lbl: 'Hunters deployed',     sub: '4 locations',        subColor: '#888780' },
-  { val: 4,  lbl: 'Artifacts catalogued', sub: '2 found',            subColor: '#854f0b' },
+  { val: 7,  lbl: 'Entities on record',   sub: '4 still active',    subColor: '#ff4d4d' },
+  { val: 5,  lbl: 'Operations logged',    sub: 'this cycle',         subColor: '#555' },
+  { val: 3,  lbl: 'Hunters deployed',     sub: '4 locations',        subColor: '#555' },
+  { val: 4,  lbl: 'Artifacts catalogued', sub: '2 found',            subColor: '#ba7517' },
 ]
 
 const recentOps = [
@@ -23,9 +24,9 @@ const threats = [
 ]
 
 function terrorColor(t) {
-  if (t >= 8) return '#e24b4a'
-  if (t >= 4) return '#ba7517'
-  return '#639922'
+  if (t >= 8) return '#ff4d4d'; 
+  if (t >= 4) return '#ba7517'; 
+  return '#639922'; 
 }
 
 export default function Dashboard() {
@@ -33,79 +34,118 @@ export default function Dashboard() {
     <>
       <div className="topbar">
         <div>
-          <div className="topbar-title">Dashboard</div>
-          <div className="topbar-sub">Last sync 2026-04-28 · Clearance: Hunter Active</div>
+          <div className="topbar-title">Central Command</div>
+          <div className="topbar-sub">System Time: 2026-04-28 // Clearance: Alpha-4</div>
         </div>
-        <span className="status-pill">System Online</span>
+        <span className="status-pill">Uplink Stable</span>
       </div>
 
-      <div className="page-content">
+      <div className="main-content" style={{ marginLeft: 0 }}> {/* Removed duplicate margin since it's in App.css */}
         {/* Stat cards */}
         <div className="stat-grid">
           {stats.map((s) => (
             <div key={s.lbl} className="stat-card">
               <div className="stat-val">{s.val}</div>
               <div className="stat-lbl">{s.lbl}</div>
-              <div className="stat-sub" style={{ color: s.subColor }}>{s.sub}</div>
+              <div className="stat-sub" style={{ color: s.subColor, fontSize: '9px', textTransform: 'uppercase' }}>{s.sub}</div>
             </div>
           ))}
         </div>
 
         {/* Hunter + Ops row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 12, marginBottom: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 15, marginBottom: 15 }}>
           {/* Hunter card */}
           <div className="card">
-            <div className="card-label">your hunter</div>
-            <div style={{ width: 42, height: 42, borderRadius: '50%', background: '#eeedfe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 500, color: '#3c3489' }}>ZM</div>
-            <div style={{ fontSize: 14, fontWeight: 500, marginTop: 8 }}>Zane Miller</div>
-            <div style={{ fontSize: 12, color: '#888780' }}>Rookie · Vanguard · Tracking</div>
-            <div style={{ marginTop: 10 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#888780', marginBottom: 4 }}>
-                <span>XP</span><span>340/500</span>
+            <div className="card-label">Active Operative</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ 
+                    width: 42, height: 42, 
+                    borderRadius: '2px', 
+                    background: '#ff4d4d', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontSize: 13, 
+                    fontWeight: 'bold', 
+                    color: '#000' 
+                }}>ZM</div>
+                <div>
+                    <div style={{ fontSize: 14, fontWeight: 'bold', color: '#fff' }}>Zane Miller</div>
+                    <div style={{ fontSize: 10, color: '#ff4d4d', textTransform: 'uppercase' }}>Vanguard / Rookie</div>
+                </div>
+            </div>
+            
+            <div style={{ marginTop: 15 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#555', marginBottom: 4, textTransform: 'uppercase' }}>
+                <span>XP Progress</span><span>340/500</span>
               </div>
-              <div style={{ height: 5, background: '#f1efe8', borderRadius: 3 }}>
-                <div style={{ height: 5, width: '68%', background: '#7f77dd', borderRadius: 3 }} />
+              <div style={{ height: 4, background: '#050505', border: '1px solid #1a1a1a' }}>
+                <div style={{ height: '100%', width: '68%', background: '#ff4d4d', boxShadow: '0 0 8px rgba(255, 77, 77, 0.4)' }} />
               </div>
             </div>
-            <div className="card-label" style={{ marginTop: 14 }}>abilities</div>
+
+            <div className="card-label" style={{ marginTop: 25 }}>Core Abilities</div>
             {['True Sight', 'Banishment'].map((a) => (
-              <div key={a} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid rgba(0,0,0,0.06)', fontSize: 12 }}>
-                <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#7f77dd', flexShrink: 0 }} />{a}
+              <div key={a} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0', borderBottom: '1px solid #111', fontSize: 11, color: '#aaa' }}>
+                <div style={{ width: 4, height: 4, background: '#ff4d4d' }} /> {a}
               </div>
             ))}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: 12 }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#d3d1c7', flexShrink: 0 }} />
-              <span style={{ color: '#888780' }}>Flame Burst (locked)</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0', fontSize: 11, color: '#333' }}>
+              <div style={{ width: 4, height: 4, background: '#222' }} />
+              <span>Flame Burst [LOCKED]</span>
             </div>
           </div>
 
           {/* Recent ops */}
           <div className="card">
-            <div className="card-label">recent operations</div>
-            {recentOps.map((op) => (
-              <div key={op.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 500 }}>{op.name} — {op.type}</div>
-                  <div style={{ fontSize: 11, color: '#888780' }}>{op.location} · {op.date}</div>
+            <div className="card-label">Operational Logs</div>
+            <div style={{ maxHeight: '310px', overflowY: 'auto', paddingRight: '10px' }}>
+                {recentOps.map((op) => (
+                <div key={op.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 0', borderBottom: '1px solid #111' }}>
+                    <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 'bold', color: '#fff' }}>
+                        {op.name} <span style={{color: '#333', fontWeight: 'normal'}}>//</span> {op.type}
+                    </div>
+                    <div style={{ fontSize: 10, color: '#444', textTransform: 'uppercase', marginTop: 2 }}>{op.location} • {op.date}</div>
+                    </div>
+                    <span className={`badge badge-${op.outcome}`}>{op.outcome}</span>
                 </div>
-                <span className={`badge badge-${op.outcome}`}>{op.outcome}</span>
-              </div>
-            ))}
+                ))}
+            </div>
           </div>
         </div>
 
         {/* Active threats */}
         <div className="card">
-          <div className="card-label">active threats</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div className="card-label">High-Priority Terror Signatures</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
             {threats.map((t) => (
-              <div key={t.name} style={{ background: '#f9f8f4', border: '1px solid rgba(0,0,0,0.06)', borderRadius: 10, padding: '10px 12px' }}>
-                <div style={{ fontSize: 13, fontWeight: 500 }}>{t.name}</div>
-                <div style={{ fontSize: 11, color: '#888780', marginTop: 1 }}>{t.type} · {t.location}</div>
-                <div style={{ height: 4, background: '#e8e6df', borderRadius: 2, marginTop: 8 }}>
-                  <div style={{ height: 4, width: `${t.terror * 10}%`, background: terrorColor(t.terror), borderRadius: 2 }} />
+              <div key={t.name} style={{ 
+                  background: '#050505', 
+                  border: '1px solid #1a1a1a', 
+                  padding: '15px',
+                  position: 'relative',
+                  overflow: 'hidden'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <div style={{ fontSize: 13, fontWeight: 'bold', color: '#fff', textTransform: 'uppercase' }}>{t.name}</div>
+                    <span style={{ fontSize: 10, color: terrorColor(t.terror), fontWeight: 'bold' }}>LVL {t.terror}</span>
                 </div>
-                <span className={`badge badge-${t.state}`} style={{ marginTop: 6 }}>{t.state} · terror {t.terror}</span>
+                <div style={{ fontSize: 9, color: '#444', textTransform: 'uppercase', letterSpacing: '1px' }}>{t.type} // {t.location}</div>
+                
+                <div style={{ height: 2, background: '#111', marginTop: 12 }}>
+                  <div style={{ 
+                      height: '100%', 
+                      width: `${t.terror * 10}%`, 
+                      background: terrorColor(t.terror), 
+                      boxShadow: `0 0 10px ${terrorColor(t.terror)}44` 
+                  }} />
+                </div>
+
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10}}>
+                    <span className={`badge badge-${t.state}`} style={{ fontSize: '8px' }}>{t.state}</span>
+                    <span style={{ fontSize: '8px', color: '#222' }}>SIG_DETECTED</span>
+                </div>
               </div>
             ))}
           </div>

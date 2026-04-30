@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Authorize = () => {
     const { state } = useLocation();
@@ -12,19 +11,17 @@ const Authorize = () => {
     const hunter = state?.hunter;
     const location = state?.location;
 
-    // State for the new operation type requirement
     const [operationType, setOperationType] = useState("");
     const [authResult, setAuthResult] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const handleAuthorizationRequest = async () => {
         if (!hunter || !location) {
-            toast.error("Data Corruption: Missing personnel or location parameters.");
+            toast.error("DATA CORRUPTION: MISSING PARAMETERS");
             return;
         }
-
         if (!operationType) {
-            toast.warn("Administrative Requirement: Select Operation Type.");
+            toast.warn("PROTOCOL ERROR: SELECT OPERATION TYPE");
             return;
         }
 
@@ -33,19 +30,11 @@ const Authorize = () => {
             const response = await axios.post("http://localhost:3000/api/authorize", {
                 hunterId: hunter.hunter_id,
                 locationId: location.location_id,
-                operationType: operationType // Sending the new parameter to server.js
+                operationType: operationType
             });
-
             setAuthResult(response.data);
-            
-            if (response.data.authorized) {
-                toast.success("Clearance Granted.");
-            } else {
-                toast.error("Clearance Denied.");
-            }
         } catch (error) {
-            console.error(error);
-            toast.error("Terminal Error: Could not reach Authorization Server.");
+            toast.error("UPLINK LOST: AUTHORIZATION SERVER OFFLINE");
         } finally {
             setLoading(false);
         }
@@ -53,81 +42,125 @@ const Authorize = () => {
 
     if (!hunter || !location) {
         return (
-            <div className="container mt-5 bg-dark text-danger p-5 rounded border border-danger">
-                <h1>ACCESS RESTRICTED</h1>
-                <p>No deployment data detected. Please restart selection process.</p>
-                <button className="btn btn-outline-danger" onClick={() => navigate("/")}>
-                    Return to Start
-                </button>
+            <div className="auth-error-screen">
+                <h1 className="glitch-text">ACCESS DENIED</h1>
+                <p>NO DEPLOYMENT DATA DETECTED IN BUFFER</p>
+                <button onClick={() => navigate("/")} className="terminal-btn">REBOOT SYSTEM</button>
             </div>
         );
     }
 
     return (
-        <div className="container mt-5 bg-black text-success p-5 rounded border border-success shadow-lg">
-            <ToastContainer theme="dark" />
+        <div className="auth-terminal-wrapper">
+            <ToastContainer theme="dark" position="bottom-right" />
             
-            <h1 className="text-uppercase border-bottom border-success pb-3 mb-4">
-                Deployment Authorization Terminal
-            </h1>
-
-            <div className="row mb-4">
-                <div className="col-md-6">
-                    <h5 className="text-muted text-uppercase">Asset Details</h5>
-                    <p className="mb-1"><strong>Name:</strong> {hunter.hunter_name}</p>
-                    <p className="mb-1"><strong>Specialization:</strong> <span className="text-info">{hunter.type}</span></p>
-                </div>
-                <div className="col-md-6 border-start border-secondary">
-                    <h5 className="text-muted text-uppercase">Target Parameters</h5>
-                    <p className="mb-1"><strong>Sector:</strong> {location.location_name}</p>
-                    <p className="mb-1"><strong>Risk Level:</strong> <span className="text-danger">{location.risk_level}</span></p>
-                </div>
+            <div className="terminal-header">
+                <div className="header-top">DEPLOYMENT AUTHORIZATION TERMINAL</div>
+                <div className="header-sub">ENCRYPTED UPLINK // SESSION_{Math.floor(Math.random() * 9000) + 1000}</div>
             </div>
 
-            <hr className="border-secondary" />
-
-            {/* NEW: Operation Type Selection */}
-            <div className="my-4">
-                <label className="form-label text-uppercase text-muted small">Specify Operation Type</label>
-                <select 
-                    className="form-select bg-dark text-success border-success"
-                    value={operationType}
-                    onChange={(e) => setOperationType(e.target.value)}
-                    disabled={authResult !== null}
-                >
-                    <option value="">-- SELECT PROTOCOL --</option>
-                    <option value="Scouting">Scouting (Requires Scout)</option>
-                    <option value="Recovery">Recovery (Requires Collector)</option>
-                    <option value="Combat">Combat (Requires Attacker)</option>
-                </select>
-            </div>
-
-            <div className="text-center my-5">
-                {!authResult ? (
-                    <button 
-                        className="btn btn-outline-success btn-lg px-5 py-3" 
-                        onClick={handleAuthorizationRequest}
-                        disabled={loading}
-                    >
-                        {loading ? "PROCESSING..." : "REQUEST FINAL AUTHORIZATION"}
-                    </button>
-                ) : (
-                    <div className={`p-4 border ${authResult.authorized ? 'border-success bg-dark' : 'border-danger bg-dark'}`}>
-                        <h2 className={authResult.authorized ? 'text-success' : 'text-danger'}>
-                            {authResult.authorized ? ">>> STATUS: AUTHORIZED" : ">>> STATUS: DENIED"}
-                        </h2>
-                        <p className="fs-4 mt-3 text-white">"{authResult.message}"</p>
-                        
-                        <button className="btn btn-outline-secondary mt-4" onClick={() => navigate("/")}>
-                            RESET TERMINAL
-                        </button>
+            <div className="terminal-body">
+                <div className="params-grid">
+                    <div className="param-box">
+                        <label>ASSET_ID</label>
+                        <div className="val highlight">{hunter.hunter_name}</div>
+                        <label>SPEC_CLASS</label>
+                        <div className="val">{hunter.type}</div>
                     </div>
-                )}
+                    <div className="param-box separator">
+                        <label>TARGET_ZONE</label>
+                        <div className="val highlight">{location.location_name}</div>
+                        <label>RISK_LEVEL</label>
+                        <div className="val danger">{location.risk_level}</div>
+                    </div>
+                </div>
+
+                <div className="protocol-selector">
+                    <label>EXECUTION PROTOCOL</label>
+                    <select 
+                        className="terminal-select"
+                        value={operationType}
+                        onChange={(e) => setOperationType(e.target.value)}
+                        disabled={authResult !== null}
+                    >
+                        <option value="">-- SELECT PROTOCOL --</option>
+                        <option value="Scouting">SCOUTING (RECON)</option>
+                        <option value="Recovery">RECOVERY (RETRIEVAL)</option>
+                        <option value="Combat">COMBAT (NEUTRALIZATION)</option>
+                    </select>
+                </div>
+
+                <div className="auth-action-area">
+                    {!authResult ? (
+                        <button 
+                            className={`auth-btn ${loading ? 'loading' : ''}`} 
+                            onClick={handleAuthorizationRequest}
+                            disabled={loading}
+                        >
+                            {loading ? "COMMUNICATING..." : "REQUEST FINAL AUTHORIZATION"}
+                        </button>
+                    ) : (
+                        <div className={`result-screen ${authResult.authorized ? 'granted' : 'denied'}`}>
+                            <h2>{authResult.authorized ? ">>> ACCESS GRANTED" : ">>> ACCESS DENIED"}</h2>
+                            <p>{authResult.message}</p>
+                            <button className="terminal-btn mt-20" onClick={() => navigate("/dashboard")}>
+                                {authResult.authorized ? "PROCEED TO COMMAND" : "RETURN TO ROSTER"}
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            <p className="text-center text-muted x-small mt-5">
-                SYSTEM LOG: Protocol {operationType || "NULL"} initialized for Asset_{hunter.hunter_id}.
-            </p>
+            <style>{`
+                .auth-terminal-wrapper {
+                    min-height: 100vh;
+                    background: #000;
+                    color: #00ff41; /* Classic Matrix/Terminal Green */
+                    font-family: 'JetBrains Mono', monospace;
+                    padding: 60px 20px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                .terminal-header { width: 100%; max-width: 700px; border-bottom: 2px solid #00ff41; padding-bottom: 10px; margin-bottom: 30px; }
+                .header-top { font-size: 24px; font-weight: bold; letter-spacing: 2px; }
+                .header-sub { font-size: 10px; color: #008f11; margin-top: 5px; }
+
+                .terminal-body { width: 100%; max-width: 700px; background: rgba(0, 50, 0, 0.1); border: 1px solid #004400; padding: 30px; }
+                
+                .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+                .param-box label { display: block; font-size: 10px; color: #008f11; margin-bottom: 5px; }
+                .param-box .val { font-size: 18px; color: #eee; }
+                .param-box .val.highlight { color: #00ff41; font-weight: bold; }
+                .param-box .val.danger { color: #ff4d4d; font-weight: bold; }
+                .separator { border-left: 1px solid #004400; padding-left: 40px; }
+
+                .protocol-selector { margin-bottom: 40px; }
+                .protocol-selector label { display: block; font-size: 10px; color: #008f11; margin-bottom: 10px; }
+                .terminal-select { 
+                    width: 100%; background: #000; border: 1px solid #00ff41; color: #00ff41; 
+                    padding: 12px; font-family: inherit; outline: none; cursor: pointer;
+                }
+
+                .auth-btn {
+                    width: 100%; padding: 20px; background: transparent; border: 1px solid #00ff41;
+                    color: #00ff41; font-weight: bold; font-family: inherit; cursor: pointer;
+                    transition: 0.3s; letter-spacing: 2px;
+                }
+                .auth-btn:hover:not(:disabled) { background: #00ff41; color: #000; box-shadow: 0 0 20px #00ff41; }
+                .auth-btn:disabled { border-color: #004400; color: #004400; cursor: not-allowed; }
+
+                .result-screen { padding: 30px; text-align: center; border: 2px solid; }
+                .result-screen.granted { border-color: #00ff41; background: rgba(0, 255, 65, 0.05); }
+                .result-screen.denied { border-color: #ff4d4d; background: rgba(255, 77, 77, 0.05); color: #ff4d4d; }
+                .result-screen h2 { margin-bottom: 15px; }
+
+                .terminal-btn { 
+                    background: transparent; border: 1px solid currentColor; color: inherit; 
+                    padding: 10px 25px; cursor: pointer; font-family: inherit; font-size: 11px;
+                }
+                .mt-20 { margin-top: 20px; }
+            `}</style>
         </div>
     );
 };

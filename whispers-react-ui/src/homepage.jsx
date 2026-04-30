@@ -44,7 +44,7 @@ const Homepage = () => {
 
                 <button 
                     className="btn btn-outline-danger btn-lg px-5 py-3 text-uppercase fw-bold"
-                    onClick={() => navigate('/hunters')}
+                    onClick={() => navigate('/initialize')}
                     style={{letterSpacing: '5px', transition: '0.3s'}}
                     onMouseOver={(e) => e.target.style.boxShadow = '0 0 20px #ff0000'}
                     onMouseOut={(e) => e.target.style.boxShadow = 'none'}
