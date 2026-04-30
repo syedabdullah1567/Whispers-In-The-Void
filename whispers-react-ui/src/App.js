@@ -1,23 +1,52 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Homepage from './homepage'; // New import
-import Hunters from './hunters';
-import Locations from './locations';
-import Authorize from './authorize';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import FloatingDock from './FloatingDock'; // Removed /components/
+import Dashboard from './Dashboard';       // Removed /pages/
+import Homepage from './homepage';         // Removed /pages/
+import Hunters from './hunters';           // Removed /pages/
+import Locations from './locations';       // Removed /pages/
+import Authorize from './authorize';       // Removed /pages/
+import {
+  EntityRegistry, ArtifactVault,
+  OpsLog, Bloodlines,
+  WeaknessIntel,
+} from './stubs'; // Removed /pages/
+import './App.css';
 
-function App() {
+// Layout for the Strategic Dashboard (Command Center)
+const DashboardLayout = ({ children }) => (
+  <div className="app-root">
+    <FloatingDock />
+    <main className="main-content">
+      {children}
+    </main>
+  </div>
+);
+
+export default function App() {
   return (
-    <Router>
-      <div style={{ backgroundColor: '#000', minHeight: '100vh' }}>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/hunters" element={<Hunters />} />
-          <Route path="/location" element={<Locations />} />
-          <Route path="/authorize" element={<Authorize />} />
-        </Routes>
-      </div>
-    </Router>
-  );
-}
+    <BrowserRouter>
+      <Routes>
+        {/* --- STRATEGIC COMMAND CENTER (Sleek UI) --- */}
+        <Route path="/" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
+        <Route path="/entities" element={<DashboardLayout><EntityRegistry /></DashboardLayout>} />
+        <Route path="/artifacts" element={<DashboardLayout><ArtifactVault /></DashboardLayout>} />
+        <Route path="/ops-log" element={<DashboardLayout><OpsLog /></DashboardLayout>} />
+        <Route path="/bloodlines" element={<DashboardLayout><Bloodlines /></DashboardLayout>} />
+        <Route path="/weaknesses" element={<DashboardLayout><WeaknessIntel /></DashboardLayout>} />
+        <Route path="/hunters" element={<DashboardLayout><Hunters viewOnly={true} /></DashboardLayout>} />
 
-export default App;
+        {/* --- FIELD TERMINAL / GAME LOOP (Horror UI) --- */}
+        {/* We enter this 'mode' via the Send Operation button */}
+        <Route path="/send-operation" element={<Homepage />} />
+        
+        {/* The step-by-step mission deployment */}
+        <Route path="/op-select-hunter" element={<Hunters viewOnly={false} />} />
+        <Route path="/op-select-location" element={<Locations />} />
+        <Route path="/op-authorize" element={<Authorize />} />
+
+        {/* Catch-all to redirect to dashboard */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
