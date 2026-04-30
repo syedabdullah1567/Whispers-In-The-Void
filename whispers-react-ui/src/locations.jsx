@@ -1,71 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 
 const Locations = () => {
-    const [locationsArr, setLocations] = useState([]);
-    const [selectedLocation, setSelectedLocation] = useState(null);
+    const { state } = useLocation(); // Receives the selected hunter
+    const [locations, setLocations] = useState([]);
     const navigate = useNavigate();
-    const { state } = useLocation();
-    const hunter = state?.hunter;
-
-    const API_URL = "http://localhost:3000/api/locations";
-
-    const fetchLocations = async () => {
-        try {
-            const response = await axios.get(API_URL);
-            setLocations(response.data.locationData); 
-        } catch (error) {
-            toast.error("Failed to fetch location records.");
-        }
-    };
 
     useEffect(() => {
-        fetchLocations();
+        axios.get("http://localhost:3000/api/locations")
+            .then(res => setLocations(res.data.locationData));
     }, []);
 
-    const handleProceed = () => {
-        if (!selectedLocation) {
-            toast.warn("Administrative Error: No location selected.");
-            return;
-        }
-        navigate("/authorize", { state: { hunter: hunter, location: selectedLocation } });
+    const handleSelect = (loc) => {
+        navigate('/op-authorize', { 
+            state: { 
+                hunter: state.hunter, 
+                location: loc 
+            } 
+        });
     };
 
     return (
-        <div className="container mt-5 bg-dark text-light p-5 rounded">
-            <ToastContainer theme="dark" />
-            <h1 className="mb-4 text-uppercase">Area of Operation</h1>
-            <p className="text-muted">Deploying Asset: {hunter?.hunter_name || "Unknown"}</p>
-            
-            <table className="table table-dark table-hover">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Risk Level</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {locationsArr.map((loc) => (
-                        <tr 
-                            key={loc.location_id} 
-                            onClick={() => setSelectedLocation(loc)}
+        <div className="container mt-5 bg-black text-success p-5 border border-success">
+            <h2 className="text-uppercase mb-4">SELECT TARGET SECTOR</h2>
+            <p className="text-muted small">ASSET: {state?.hunter?.hunter_name} READY FOR DEPLOYMENT</p>
+            <div className="row">
+                {locations.map(l => (
+                    <div key={l.location_id} className="col-md-6 mb-3">
+                        <div 
+                            className="card bg-dark text-success border-success p-3" 
                             style={{ cursor: 'pointer' }}
-                            className={selectedLocation?.location_id === loc.location_id ? "table-active border-primary" : ""}
+                            onClick={() => handleSelect(l)}
                         >
-                            <td>{loc.location_name}</td>
-                            <td>{loc.location_type}</td>
-                            <td>{loc.risk_level}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            <button className="btn btn-outline-primary mt-4" onClick={handleProceed}>
-                CONFIRM DEPLOYMENT ZONE
-            </button>
+                            <h4>{l.location_name}</h4>
+                            <p className="mb-0 text-danger">RISK LEVEL: {l.risk_level}</p>
+                            <p className="small text-muted">{l.location_type}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };

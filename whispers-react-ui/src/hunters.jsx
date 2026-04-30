@@ -1,80 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate } from "react-router-dom";
-import 'react-toastify/dist/ReactToastify.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
-const Hunters = () => {
-    const [huntersArr, setHunters] = useState([]);
-    const [selectedHunter, setSelectedHunter] = useState(null);
+const Hunters = ({ viewOnly }) => {
+    const [hunters, setHunters] = useState([]);
     const navigate = useNavigate();
-    const API_URL = "http://localhost:3000/api/hunters";
-
-    const fetchHunters = async () => {
-        try {
-            const response = await axios.get(API_URL);
-            setHunters(response.data.hunterData);
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to fetch administrative records.");
-        }
-    };
 
     useEffect(() => {
+        const fetchHunters = async () => {
+            try {
+                const response = await axios.get("http://localhost:3000/api/hunters");
+                setHunters(response.data.hunterData);
+            } catch (error) {
+                console.error("Failed to fetch hunters", error);
+            }
+        };
         fetchHunters();
     }, []);
 
-    const handleProceed = () => {
-        if (!selectedHunter) {
-            toast.warn("Administrative Error: No hunter selected for deployment.");
-            return;
-        }
-        // Navigate to authorization/operation page and pass the selected hunter's data
-        navigate("/location", { state: { hunter: selectedHunter } });
+    const handleSelect = (hunter) => {
+        if (viewOnly) return; 
+        // Navigate to the next step of the game loop
+        navigate('/op-select-location', { state: { hunter } });
     };
 
     return (
-        <div className="container mt-5 bg-dark text-light p-5 rounded">
-            <ToastContainer theme="dark" />
-            <h1 className="mb-4 text-uppercase">Personnel Selection</h1>
-            <p className="text-muted">Select an asset for field operation. Outcome is data-dependent.</p>
-            
-            <table className="table table-dark table-hover border-secondary">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Rank</th>
-                        <th>Type</th>
-                        <th>Faction</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {huntersArr.map((hun) => (
-                        <tr 
-                            key={hun.hunter_id} 
-                            onClick={() => setSelectedHunter(hun)}
-                            style={{ cursor: 'pointer' }}
-                            className={selectedHunter?.hunter_id === hun.hunter_id ? "table-active border-primary" : ""}
+        <div className={viewOnly ? "page-content" : "container mt-5 bg-black text-danger p-4 border border-danger"}>
+            <h2 className="text-uppercase mb-4">{viewOnly ? "Personnel Roster" : "SELECT DEPLOYMENT ASSET"}</h2>
+            <div className="row">
+                {hunters.map(h => (
+                    <div key={h.hunter_id} className="col-md-4 mb-3">
+                        <div 
+                            className={`card p-3 ${!viewOnly ? 'bg-dark text-danger border-danger cursor-pointer' : ''}`}
+                            onClick={() => handleSelect(h)}
+                            style={{ cursor: viewOnly ? 'default' : 'pointer' }}
                         >
-                            <td>{hun.hunter_name}</td>
-                            <td>{hun.rank}</td>
-                            <td>{hun.type}</td>
-                            <td>{hun.faction}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            <div className="mt-4 d-flex justify-content-between align-items-center">
-                <div>
-                    {selectedHunter && (
-                        <span className="text-info">Selected: {selectedHunter.hunter_name} ({selectedHunter.rank})</span>
-                    )}
-                </div>
-                <button className="btn btn-outline-primary" onClick={handleProceed}>
-                    PROCEED TO SELECTING LOCATION
-                </button>
+                            <h5>{h.hunter_name}</h5>
+                            <p className="small mb-1 text-muted">RANK: {h.rank}</p>
+                            <p className="small mb-0 text-info">TYPE: {h.type}</p>
+                            {!viewOnly && <div className="text-end mt-2"><small className="btn btn-sm btn-outline-danger">SELECT</small></div>}
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

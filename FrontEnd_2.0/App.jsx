@@ -1,15 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import FloatingDock from './FloatingDock'; // Removed /components/
-import Dashboard from './Dashboard';       // Removed /pages/
-import Homepage from './homepage';         // Removed /pages/
-import Hunters from './hunters';           // Removed /pages/
-import Locations from './locations';       // Removed /pages/
-import Authorize from './authorize';       // Removed /pages/
+import FloatingDock from './components/FloatingDock';
+import Dashboard from './pages/Dashboard';
+import Homepage from './pages/Homepage'; // Our horror landing page
+import Hunters from './pages/Hunters';   // Our selection logic
+import Locations from './pages/Locations'; // Our selection logic
+import Authorize from './pages/Authorize'; // Our terminal logic
 import {
   EntityRegistry, ArtifactVault,
   OpsLog, Bloodlines,
   WeaknessIntel,
-} from './stubs'; // Removed /pages/
+} from './pages/stubs';
 import './App.css';
 
 // Layout for the Strategic Dashboard (Command Center)
