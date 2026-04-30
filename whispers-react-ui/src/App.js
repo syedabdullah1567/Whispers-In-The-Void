@@ -9,6 +9,7 @@ import AuthSequence from './AuthSequence';
 import HunterSelection from './HunterSelection';
 import LocationSelection from './LocationSelection';
 import Bloodlines from './bloodlines';
+import ScoutingMission from './ScoutingMission';
 import {
   EntityRegistry, ArtifactVault,
   OpsLog,
@@ -51,7 +52,9 @@ export default function App() {
 
         <Route path="/initialize" element={<AuthSequence />} />
 
-        
+        {/* Missions */}
+
+        <Route path="/scout-operation" element={<DashboardLayout><ScoutingMission /></DashboardLayout>} />
 
         {/* Catch-all to redirect to dashboard */}
         <Route path="*" element={<Navigate to="/" />} />

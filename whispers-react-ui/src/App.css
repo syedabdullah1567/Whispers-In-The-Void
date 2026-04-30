@@ -202,3 +202,24 @@ select:focus {
   40% { opacity: 1; transform: skew(-1deg); }
   100% { opacity: 0.9; }
 }
+
+.signal-indicator {
+    font-size: 10px;
+    color: #639922;
+    margin-top: 10px;
+    letter-spacing: 1px;
+}
+.pulse-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #639922;
+    border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 1s infinite;
+}
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}

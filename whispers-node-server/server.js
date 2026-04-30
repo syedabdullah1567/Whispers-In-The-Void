@@ -88,3 +88,31 @@ app.post("/api/authorize", async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
+app.post("/api/missions/scout", async (req, res) => {
+    // 1. Extract locationId (camelCase)
+    const { locationId } = req.body; 
+
+    try {
+        const pool = await poolPromise;
+        
+        // 2. Use the exact variable 'locationId' we just extracted
+        await pool.request()
+            .input('locationID', sql.Int, locationId) 
+            .execute('ScoutingMission');
+
+        console.log(`Mission Log: Sector ${locationId} scanning initiated. Artifacts active.`);
+
+        res.status(200).json({
+            success: true,
+            message: `MISSION_SUCCESS: SECTOR_${locationId} ARTIFACTS_ACTIVATED`
+        });
+    } catch (error) {
+        console.error('Field Operational Error: ', error);
+        res.status(500).json({ 
+            success: false, 
+            message: "UPLINK_FAILURE", 
+            error: error.message 
+        });
+    }
+});

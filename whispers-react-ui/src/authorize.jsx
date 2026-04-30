@@ -27,13 +27,37 @@ const Authorize = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post("http://localhost:3000/api/authorize", {
+            // 1. Primary Authorization Call
+            const authResponse = await axios.post("http://localhost:3000/api/authorize", {
                 hunterId: hunter.hunter_id,
                 locationId: location.location_id,
                 operationType: operationType
             });
-            setAuthResult(response.data);
+
+            // Capture data locally to avoid issues with async state updates
+            let finalData = authResponse.data;
+
+            // 2. Automated Scouting Link (Triggers only if authorized and type is Scouting)
+            if (finalData.authorized && operationType === "Scouting") {
+                toast.info("UPLINK GRANTED: INITIALIZING SIGNAL INJECTION...");
+            
+                try {
+                    await axios.post('http://localhost:3000/api/missions/scout', { 
+                        locationId: Number(location.location_id) 
+                    });
+                    
+                    // Modify the message locally to reflect success
+                    finalData.message += " // SCOUTING_SATELLITE_UPLINK_LIVE";
+                } catch (scoutErr) {
+                    console.error("Scouting Mission Trigger Failed:", scoutErr);
+                    finalData.message += " // SCOUT_AUTO_TRIGGER_ERROR";
+                }
+            }
+
+            setAuthResult(finalData);
+
         } catch (error) {
+            console.error("Authorization Error:", error);
             toast.error("UPLINK LOST: AUTHORIZATION SERVER OFFLINE");
         } finally {
             setLoading(false);
@@ -102,15 +126,26 @@ const Authorize = () => {
                     ) : (
                         <div className={`result-screen ${authResult.authorized ? 'granted' : 'denied'}`}>
                             <h2>{authResult.authorized ? ">>> ACCESS GRANTED" : ">>> ACCESS DENIED"}</h2>
-                            <p>{authResult.message}</p>
-    
+                            
+                            <p style={{ letterSpacing: '1px', fontSize: '14px' }}>{authResult.message}</p>
+
+                            {authResult.authorized && operationType === "Scouting" && (
+                                <div className="pulse" style={{ fontSize: '11px', color: '#00ff41', marginTop: '15px' }}>
+                                    [!] ARTIFACT_SIGNAL_ACTIVE: SECTOR_{location.location_id}
+                                </div>
+                            )}
+
                             <button 
-                            className="terminal-btn mt-20" 
-                            onClick={() => {
-                            if (authResult.authorized) {
-                                navigate("/");
-                            } else {navigate("/hunter-select");}}}>
-                            {authResult.authorized ? "PROCEED TO COMMAND" : "RE-EVALUATE ASSET"}
+                                className="terminal-btn mt-20" 
+                                onClick={() => {
+                                    if (authResult.authorized) {
+                                        navigate("/"); 
+                                    } else {
+                                        navigate("/hunter-select");
+                                    }
+                                }}
+                            >
+                                {authResult.authorized ? "PROCEED TO COMMAND" : "RE-EVALUATE ASSET"}
                             </button>
                         </div>
                     )}
@@ -121,7 +156,7 @@ const Authorize = () => {
                 .auth-terminal-wrapper {
                     min-height: 100vh;
                     background: #000;
-                    color: #00ff41; /* Classic Matrix/Terminal Green */
+                    color: #00ff41;
                     font-family: 'JetBrains Mono', monospace;
                     padding: 60px 20px;
                     display: flex;
@@ -166,6 +201,20 @@ const Authorize = () => {
                     padding: 10px 25px; cursor: pointer; font-family: inherit; font-size: 11px;
                 }
                 .mt-20 { margin-top: 20px; }
+
+                .pulse {
+                    animation: pulse-green 2s infinite;
+                    font-weight: bold;
+                    text-shadow: 0 0 5px #00ff41;
+                }
+
+                @keyframes pulse-green {
+                    0% { opacity: 1; }
+                    50% { opacity: 0.4; }
+                    100% { opacity: 1; }
+                }
+
+                .loading { cursor: wait; opacity: 0.7; border-style: dashed !important; }
             `}</style>
         </div>
     );
