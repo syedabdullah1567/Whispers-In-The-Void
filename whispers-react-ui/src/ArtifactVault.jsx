@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
 const ArtifactVault = () => {
     const [artifacts, setArtifacts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // This runs as soon as the "Artifact Vault" page opens
     useEffect(() => {
-        // Replace '1' with a dynamic ID based on user selection if needed
+    console.log("useEffect triggered");
         const locationId = 1; 
 
-        fetch(`http://localhost:5000/api/artifacts/${locationId}`)
-            .then(res => res.json())
+        fetch(`http://localhost:3000/api/artifacts/${locationId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
             .then(data => {
-                setArtifacts(data);
+                // Ensure data is an array before setting state
+                if (Array.isArray(data)) {
+                    setArtifacts(data);
+                } else {
+                    console.error("Data received is not an array:", data);
+                    setArtifacts([]);
+                }
                 setLoading(false);
             })
             .catch(err => {
@@ -34,15 +40,19 @@ const ArtifactVault = () => {
                     <p>Decrypting artifact records...</p>
                 ) : (
                     <div className="artifact-list">
-                        {artifacts.map(art => (
-                            <div key={art.ID} className="artifact-entry">
-                                <h3>{art['Artifact Name']}</h3>
-                                <p>{art.Classification} — Origin: {art['Origin Point']}</p>
-                                <span className={`status-${art['Current Status']}`}>
-                                    {art['Current Status']}
-                                </span>
-                            </div>
-                        ))}
+                        {artifacts.length > 0 ? (
+                            artifacts.map(art => (
+                                <div key={art.ID} className="artifact-entry">
+                                    <h3>{art['Artifact Name']}</h3>
+                                    <p>{art.Classification} — Origin: {art['Origin Point']}</p>
+                                    <span className={`status-${art['Current Status']}`}>
+                                        {art['Current Status']}
+                                    </span>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No artifacts found for this sector.</p>
+                        )}
                     </div>
                 )}
             </div>

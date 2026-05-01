@@ -43,15 +43,23 @@ app.get("/api/locations", async(req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
 app.get('/api/artifacts/:locationId', async (req, res) => {
+     console.log("🔥 Route hit!");
     try {
         const pool = await poolPromise; 
+        const locId = parseInt(req.params.locationId);
         let result = await pool.request()
-            .input('LocationID', sql.Int, req.params.locationId)
+            .input('LocationID', sql.Int, locId)
             .execute('Get_Artifacts_At_Location'); 
         
-        res.json(result.recordset);
+        // Use result.recordset (singular) for the primary data rows
+        const data = result.recordset; 
+
+        console.log("Sending to React:", data);
+        res.json(data);
     } catch (err) {
+        console.error(err);
         res.status(500).send({ error: err.message });
     }
 });
