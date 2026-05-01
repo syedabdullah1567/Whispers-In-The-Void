@@ -44,7 +44,8 @@ const Locations = () => {
                 gap: '15px' 
             }}>
                 {locations.map(l => (
-                    <div key={l.location_id} className="stat-card" style={{ position: 'relative' }}>
+                    <div key={l.location_id} className="stat-card" style={{ position: 'relative' }} 
+                    onClick={() => navigate('/artifacts', { state: { hunter: h } })}>
                         {/* Header: Sector ID and Risk */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                             <span style={{ fontSize: '9px', color: '#444', letterSpacing: '1px' }}>
