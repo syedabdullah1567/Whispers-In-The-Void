@@ -1,20 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom'; // Added for routing
 
 const ArtifactVault = () => {
+    const { state } = useLocation(); // Catch the data passed from Locations.jsx
+    const navigate = useNavigate();
+    
+    // Safely extract the location data from state
+    const targetLocationId = state?.locationId;
+    const targetLocationName = state?.locationName || "UNKNOWN SECTOR";
+
     const [artifacts, setArtifacts] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-    console.log("useEffect triggered");
-        const locationId = 1; 
+        // Only fetch if we actually have a locationId from the state
+        if (!targetLocationId) {
+            setLoading(false);
+            return;
+        }
 
-        fetch(`http://localhost:3000/api/artifacts/${locationId}`)
+        console.log(`useEffect triggered for Sector: ${targetLocationId}`);
+
+        fetch(`http://localhost:3000/api/artifacts/${targetLocationId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Network response was not ok');
                 return res.json();
             })
             .then(data => {
-                // Ensure data is an array before setting state
                 if (Array.isArray(data)) {
                     setArtifacts(data);
                 } else {
@@ -27,9 +39,25 @@ const ArtifactVault = () => {
                 console.error("Vault access denied:", err);
                 setLoading(false);
             });
-    }, []);
+    }, [targetLocationId]); // Re-run if targetLocationId changes
 
-if (loading) return (
+    // --- GATEKEEPER: If user arrives here without a location selection ---
+    if (!targetLocationId && !loading) {
+        return (
+            <div className="main-content" style={{ textAlign: 'center', marginTop: '15%' }}>
+                <div className="glitch-text" style={{ color: '#ff4d4d', fontSize: '24px' }}>ACCESS DENIED</div>
+                <p style={{ color: '#555', margin: '20px 0' }}>No sector targeted for relic retrieval.</p>
+                <button 
+                    onClick={() => navigate('/locations')}
+                    style={{ background: 'transparent', border: '1px solid #00ffcc', color: '#00ffcc', padding: '10px 20px', cursor: 'pointer' }}
+                >
+                    RETURN TO TACTICAL MAP
+                </button>
+            </div>
+        );
+    }
+
+    if (loading) return (
         <div className="main-content">
             <div className="glitch-text" style={{ color: '#004d40', textAlign: 'center', marginTop: '20%' }}>
                 SCANNING RELICS DATABASE...
@@ -42,7 +70,8 @@ if (loading) return (
             <div className="topbar">
                 <div>
                     <div className="topbar-title">Artifact Vault</div>
-                    <div className="topbar-sub">Relic Classification // Archive Access</div>
+                    {/* Displaying the name of the location we clicked on */}
+                    <div className="topbar-sub">Sector: {targetLocationName} // Classification Access</div>
                 </div>
                 <span className="status-pill" style={{ borderColor: '#004d40', color: '#00ffcc' }}>
                     VAULT_SYNC_ACTIVE
@@ -120,14 +149,16 @@ if (loading) return (
 
                             <div style={{ marginTop: '10px', textAlign: 'right' }}>
                                 <div style={{ fontSize: '8px', color: '#222', letterSpacing: '1px' }}>
-                                    {a['Current Status'] === 'Active' ? 'OPERATIONAL' : 'ARCHIVED'}
+                                    {a.lifecycleState || (a['Current Status'] === 'Active' ? 'OPERATIONAL' : 'ARCHIVED')}
                                 </div>
                             </div>
                         </div>
 
                     </div>
                 )) : (
-                    <p>No artifacts found for this sector.</p>
+                    <div className="stat-card" style={{ textAlign: 'center', padding: '40px', color: '#444' }}>
+                        NO ARTIFACTS FOUND FOR THIS SECTOR.
+                    </div>
                 )}
             </div>
 
@@ -194,4 +225,5 @@ if (loading) return (
         </div>
     );
 };
+
 export default ArtifactVault;

@@ -139,7 +139,7 @@ app.post("/api/missions/scout", async (req, res) => {
 /* ---------------- ENTITY REGISTRY ---------------- */
 app.get('/api/entities', async (req, res) => {
   try {
-    const pool = await sql.connect(config)
+    const pool = await poolPromise;
     const result = await pool.request().execute('sp_EntityRegistry')
     res.json(result.recordset)
     
@@ -151,6 +151,10 @@ app.get('/api/entities', async (req, res) => {
 
 app.get("/api/dashboard/stats", async (req, res) => {
   try {
+    // 1. Get the pool from the promise first
+    const pool = await poolPromise; 
+
+    // 2. Use 'pool.request()' instead of calling poolPromise directly
     const result = await pool.request()
       .output("EntityCount", sql.Int)
       .output("ActiveEntity", sql.Int)
@@ -162,9 +166,11 @@ app.get("/api/dashboard/stats", async (req, res) => {
       .output("ArtifactsUnlocked", sql.Int)
       .execute("sp_DashBoard_cards");
 
+    // Send the output parameters to the frontend
     res.json(result.output);
 
   } catch (err) {
+    console.error("DASHBOARD_UPLINK_ERROR:", err.message);
     res.status(500).json({ error: err.message });
   }
 });

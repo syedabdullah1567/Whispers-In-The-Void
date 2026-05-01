@@ -1,4 +1,4 @@
-import '../App.css';
+import './App.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -31,26 +31,25 @@ export default function Dashboard() {
   const [stats, setStats] = useState([]);
 
   useEffect(() => {
-  const fetchStats = async () => {
-    try {
-      const res = await axios.get("http://localhost:3000/api/dashboard/stats");
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/dashboard/stats");
+        const d = res.data;
+        if (d) {
+          setStats([
+            { val: d.EntityCount || 0, lbl: 'Entities on record', sub: `${d.ActiveEntity || 0} still active`, subColor: '#ff4d4d' },
+            { val: d.OpCount || 0, lbl: 'Operations logged', sub: 'this cycle', subColor: '#555' },
+            { val: d.CountDeployedHunters || 0, lbl: 'Hunters deployed', sub: `${d.LocationExplored || 0} locations`, subColor: '#555' },
+            { val: d.TotalArtifacts || 0, lbl: 'Artifacts catalogued', sub: `${d.ArtifactsUnlocked || 0} found`, subColor: '#ba7517' },
+          ]);
+        }
+      } catch (err) {
+        console.error("COMMAND_CENTER_OFFLINE:", err);
+      }
+    };
 
-      const d = res.data;
-
-      setStats([
-        { val: d.EntityCount, lbl: 'Entities on record', sub: `${d.ActiveEntity} still active`, subColor: '#ff4d4d' },
-        { val: d.OpCount, lbl: 'Operations logged', sub: 'this cycle', subColor: '#555' },
-        { val: d.CountDeployedHunters, lbl: 'Hunters deployed', sub: `${d.LocationExplored} locations`, subColor: '#555' },
-        { val: d.TotalArtifacts, lbl: 'Artifacts catalogued', sub: `${d.ArtifactsUnlocked} found`, subColor: '#ba7517' },
-      ]);
-
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  fetchStats();
-}, []);
+    fetchStats();
+  }, []);
 
   return (
     <>

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Import useNavigate
 import axios from 'axios';
 import './App.css';
 
 const Locations = () => {
     const [locations, setLocations] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate(); // 2. Initialize navigate
 
     useEffect(() => {
         const fetchLocations = async () => {
@@ -44,8 +46,23 @@ const Locations = () => {
                 gap: '15px' 
             }}>
                 {locations.map(l => (
-                    <div key={l.location_id} className="stat-card" style={{ position: 'relative' }} 
-                    onClick={() => navigate('/artifacts', { state: { hunter: h } })}>
+                    <div 
+                        key={l.location_id} 
+                        className="stat-card" 
+                        /* 3. Add cursor styling and onClick handler */
+                        style={{ position: 'relative', cursor: 'pointer', transition: 'all 0.3s' }} 
+                        onClick={() => {
+                            // Pass both ID and Name to the vault
+                            navigate('/artifacts', { 
+                                state: { 
+                                    locationId: l.location_id,
+                                    locationName: l.location_name
+                                } 
+                            });
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.borderColor = '#00ff41'}
+                        onMouseLeave={(e) => e.currentTarget.style.borderColor = '#111'}
+                    >
                         {/* Header: Sector ID and Risk */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                             <span style={{ fontSize: '9px', color: '#444', letterSpacing: '1px' }}>
