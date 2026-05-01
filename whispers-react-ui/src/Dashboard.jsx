@@ -1,12 +1,7 @@
-import React from 'react';
-import './App.css';
+import '../App.css';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-const stats = [
-  { val: 7,  lbl: 'Entities on record',   sub: '4 still active',    subColor: '#ff4d4d' },
-  { val: 5,  lbl: 'Operations logged',    sub: 'this cycle',         subColor: '#555' },
-  { val: 3,  lbl: 'Hunters deployed',     sub: '4 locations',        subColor: '#555' },
-  { val: 4,  lbl: 'Artifacts catalogued', sub: '2 found',            subColor: '#ba7517' },
-]
 
 const recentOps = [
   { name: 'Xylo-Thul',          type: 'Void Horror',  location: 'Echoing Catacombs',  date: '2026-02-15', outcome: 'neutralized' },
@@ -23,6 +18,8 @@ const threats = [
   { name: 'Morana Prime',       type: 'Lich',        location: 'Echoing Catacombs', terror: 2,  state: 'neutralized' },
 ]
 
+
+
 function terrorColor(t) {
   if (t >= 8) return '#ff4d4d'; 
   if (t >= 4) return '#ba7517'; 
@@ -30,6 +27,31 @@ function terrorColor(t) {
 }
 
 export default function Dashboard() {
+
+  const [stats, setStats] = useState([]);
+
+  useEffect(() => {
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/dashboard/stats");
+
+      const d = res.data;
+
+      setStats([
+        { val: d.EntityCount, lbl: 'Entities on record', sub: `${d.ActiveEntity} still active`, subColor: '#ff4d4d' },
+        { val: d.OpCount, lbl: 'Operations logged', sub: 'this cycle', subColor: '#555' },
+        { val: d.CountDeployedHunters, lbl: 'Hunters deployed', sub: `${d.LocationExplored} locations`, subColor: '#555' },
+        { val: d.TotalArtifacts, lbl: 'Artifacts catalogued', sub: `${d.ArtifactsUnlocked} found`, subColor: '#ba7517' },
+      ]);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  fetchStats();
+}, []);
+
   return (
     <>
       <div className="topbar">

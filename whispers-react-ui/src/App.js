@@ -1,21 +1,21 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import FloatingDock from './FloatingDock'; // Removed /components/
-import Dashboard from './Dashboard';       // Removed /pages/
-import Homepage from './homepage';         // Removed /pages/
-import Hunters from './hunters';           // Removed /pages/
-import Locations from './locations';       // Removed /pages/
-import Authorize from './authorize';       // Removed /pages/
-import AuthSequence from './AuthSequence';
-import HunterSelection from './HunterSelection';
-import LocationSelection from './LocationSelection';
-import Bloodlines from './bloodlines';
-import ScoutingMission from './ScoutingMission';
-import ArtifactVault from './ArtifactVault'; // Your new component
+import FloatingDock from './components/FloatingDock'; // Removed /components/
+import Dashboard from './pages/Dashboard';       // Removed /pages/
+import Homepage from './pages/homepage';         // Removed /pages/
+import Hunters from './pages/hunters';           // Removed /pages/
+import Locations from './pages/locations';       // Removed /pages/
+import Authorize from './pages/authorize';       // Removed /pages/
+import AuthSequence from './pages/AuthSequence';
+import HunterSelection from './pages/HunterSelection';
+import LocationSelection from './pages/LocationSelection';
+import Bloodlines from './pages/bloodlines';
+import ScoutingMission from './pages/ScoutingMission';
+import EntityRegistry from './pages/EntityRegistry';
 import {
-  EntityRegistry,
+  ArtifactVault,
   OpsLog,
   WeaknessIntel,
-} from './stubs'; // Removed /pages/
+} from './pages/stubs'; // Removed /pages/
 import './App.css';
 
 // Layout for the Strategic Dashboard (Command Center)

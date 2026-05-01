@@ -135,3 +135,36 @@ app.post("/api/missions/scout", async (req, res) => {
         });
     }
 });
+
+/* ---------------- ENTITY REGISTRY ---------------- */
+app.get('/api/entities', async (req, res) => {
+  try {
+    const pool = await sql.connect(config)
+    const result = await pool.request().execute('sp_EntityRegistry')
+    res.json(result.recordset)
+    
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+
+app.get("/api/dashboard/stats", async (req, res) => {
+  try {
+    const result = await pool.request()
+      .output("EntityCount", sql.Int)
+      .output("ActiveEntity", sql.Int)
+      .output("OpCount", sql.Int)
+      .output("OpRecorded", sql.Int)
+      .output("CountDeployedHunters", sql.Int)
+      .output("LocationExplored", sql.Int)
+      .output("TotalArtifacts", sql.Int)
+      .output("ArtifactsUnlocked", sql.Int)
+      .execute("sp_DashBoard_cards");
+
+    res.json(result.output);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
