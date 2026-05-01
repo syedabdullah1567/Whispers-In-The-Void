@@ -57,7 +57,7 @@ CREATE TABLE Artifacts (
     origin VARCHAR(100),
     location_id INT,
     status VARCHAR(20) NOT NULL DEFAULT 'Unlocated',
-    CONSTRAINT CHK_ArtifactState CHECK (status IN ('Unlocated', 'Active', 'Used')),
+    CONSTRAINT CHK_ArtifactState CHECK (status IN ('Unlocated', 'Discovered', 'Active', 'Used')),
     FOREIGN KEY (location_id)
         REFERENCES Locations(location_id)
         ON DELETE SET NULL
