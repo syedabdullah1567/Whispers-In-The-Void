@@ -45,7 +45,6 @@ app.get("/api/locations", async(req, res) => {
 });
 
 app.get('/api/artifacts/:locationId', async (req, res) => {
-     console.log("🔥 Route hit!");
     try {
         const pool = await poolPromise; 
         const locId = parseInt(req.params.locationId);
