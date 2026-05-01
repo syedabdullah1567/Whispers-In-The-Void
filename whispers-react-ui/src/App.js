@@ -10,8 +10,9 @@ import HunterSelection from './HunterSelection';
 import LocationSelection from './LocationSelection';
 import Bloodlines from './bloodlines';
 import ScoutingMission from './ScoutingMission';
+import ArtifactVault from './ArtifactVault'; // Your new component
 import {
-  EntityRegistry, ArtifactVault,
+  EntityRegistry,
   OpsLog,
   WeaknessIntel,
 } from './stubs'; // Removed /pages/
