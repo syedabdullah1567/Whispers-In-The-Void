@@ -139,6 +139,7 @@ app.post("/api/missions/scout", async (req, res) => {
 /* ---------------- ENTITY REGISTRY ---------------- */
 app.get('/api/entities', async (req, res) => {
   try {
+    console.log("Entered entities")
     const pool = await poolPromise;
     const result = await pool.request().execute('sp_EntityRegistry')
     res.json(result.recordset)
