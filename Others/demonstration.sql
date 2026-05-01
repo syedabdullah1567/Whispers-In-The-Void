@@ -53,3 +53,16 @@ BEGIN
         SET @Message = 'Authorization Granted: Asset type confirmed for ' + @OperationType + ' at ' + @LocationName + '. Godspeed.';
     END
 END;
+
+CREATE PROCEDURE ScoutingMission
+    @locationID INT
+AS
+BEGIN
+    SET NOCOUNT ON; -- Prevents extra 'rows affected' messages from slowing down the API
+
+    UPDATE Artifacts
+    SET status = 'Active'
+    WHERE location_id = @locationID 
+    AND status <> 'Active';
+END
+
