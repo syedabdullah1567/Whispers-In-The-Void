@@ -43,6 +43,18 @@ app.get("/api/locations", async(req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+app.get('/api/artifacts/:locationId', async (req, res) => {
+    try {
+        const pool = await poolPromise; 
+        let result = await pool.request()
+            .input('LocationID', sql.Int, req.params.locationId)
+            .execute('Get_Artifacts_At_Location'); 
+        
+        res.json(result.recordset);
+    } catch (err) {
+        res.status(500).send({ error: err.message });
+    }
+});
 
 app.get("/api/bloodlines", async(req, res) => {
     try {
