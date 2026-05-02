@@ -16,6 +16,7 @@ import CollectionMission from './CollectionMission';
 import EntityRegistry from './EntityRegistry';
 import ArtifactVault from './ArtifactVault';
 import OpsLog from './OperationLogs';
+import AttackingMission from './AttackingMission'; 
 import { WeaknessIntel } from './stubs';
 import './App.css';
 
@@ -107,11 +108,12 @@ export default function App() {
                     <Route path="/weaknesses" element={<DashboardLayout><WeaknessIntel /></DashboardLayout>} />
                     <Route path="/hunters" element={<DashboardLayout><Hunters /></DashboardLayout>} />
                     <Route path="/locations" element={<DashboardLayout><Locations /></DashboardLayout>} />
-
+                        
+                    
                     {/* Missions (I included these in Dashboard Music as they use the Layout) */}
                     <Route path="/scout-operation" element={<DashboardLayout><ScoutingMission /></DashboardLayout>} />
                     <Route path="/collect-operation" element={<DashboardLayout><CollectionMission /></DashboardLayout>} />
-
+                    <Route path="/attacker-gameplay" element={<AttackingMission />} />
                     <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </div>

@@ -70,20 +70,25 @@ const Authorize = () => {
                     finalData.message += " // RETRIEVE_AUTO_TRIGGER_ERROR";
                 }
             }
-            else if (finalData.authorized && operationType === "Combat") {
-                toast.info("UPLINK GRANTED: INITIALIZING SIGNAL INJECTION...");
-            
+        
+            else if (finalData.authorized && operationType === "Combat" && hunter.type === "Attacker") {
+                toast.info("COMBAT AUTHENTICATED: INITIALIZING BATTLE LOG...");
+
                 try {
-                    await axios.post('http://localhost:3000/api/missions/collection', { 
-                        locationId: Number(location.location_id),
-                        hunterId: Number(hunter.hunter_id)
+                    // This hits the API that runs [sp_starting_attack]
+                    const sessionRes = await axios.post('http://localhost:3000/api/combat/start', { 
+                        hunterId: hunter.hunter_id,
+                        locationId: location.location_id,
+                        entityId: null // Or however you are selecting your target entity
                     });
                     
-                    // Modify the message locally to reflect success
-                    finalData.message += " // RETRIEVAL_SATELLITE_UPLINK_LIVE";
-                } catch (scoutErr) {
-                    console.error("Retrieval Mission Trigger Failed:", scoutErr);
-                    finalData.message += " // RETRIEVE_AUTO_TRIGGER_ERROR";
+                    // Store the session ID in your finalData so the 'Proceed' button can use it
+                    finalData.combatSessionId = sessionRes.data.sessionId;
+                    finalData.message += " // COMBAT_SESSION_ACTIVE";
+                } catch (combatErr) {
+                    console.error("Combat Session Initialization Failed:", combatErr);
+                    finalData.message += " // SESSION_INIT_FAILURE";
+                    toast.error("CRITICAL: COULD NOT START COMBAT LOG");
                 }
             }
 
@@ -168,17 +173,29 @@ const Authorize = () => {
                                 </div>
                             )}
 
-                            <button 
+                        <button 
                                 className="terminal-btn mt-20" 
                                 onClick={() => {
                                     if (authResult.authorized) {
-                                        navigate("/dashboard"); 
+                                        // Check if we need to divert to the Gameplay Mode
+                                        if (operationType === "Combat" && hunter.type === "Attacker") {
+                                            navigate("/attacker-gameplay", { 
+                                                state: { 
+                                                    hunter, 
+                                                    location, 
+                                                    sessionId: authResult.combatSessionId // Using the ID we just generated
+                                                } 
+                                            });
+                                        } else {
+                                            // Scouting and others go back to Command
+                                            navigate("/"); 
+                                        }
                                     } else {
                                         navigate("/hunter-select");
                                     }
                                 }}
                             >
-                                {authResult.authorized ? "PROCEED TO COMMAND" : "RE-EVALUATE ASSET"}
+                                {authResult.authorized ? "PROCEED TO MISSION" : "RE-EVALUATE ASSET"}
                             </button>
                         </div>
                     )}
