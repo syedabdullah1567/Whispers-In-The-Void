@@ -70,6 +70,11 @@ BEGIN
     AND status <> 'Discovered' 
     AND status <> 'Used';
 
+    UPDATE "Entities"
+    SET existence_state = 'active'
+    WHERE current_lair_id = @locationID -- Ensure this ID matches exactly
+    AND existence_state = 'unlocated'
+
     -- Logging the operation
     IF @@ROWCOUNT > 0
     BEGIN
@@ -257,6 +262,7 @@ BEGIN
     Select E.true_name,E.entity_species,E.terror_index,E.existence_state,L.location_name,B.bloodline_name from Entities As E
     left join Locations as L on L.location_id = E.current_lair_id
     left join Bloodlines as B on B.bloodline_id = E.bloodline_id
+    WHERE E.existence_state <> 'unlocated'
 
 END
 
