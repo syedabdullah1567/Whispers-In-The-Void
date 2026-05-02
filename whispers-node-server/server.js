@@ -174,3 +174,27 @@ app.get("/api/dashboard/stats", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
+app.get('/api/hunter-activity', async (req, res) => {
+  try {
+    const pool = await poolPromise; 
+    const result = await pool.request().execute('sp_GetHunterLeaderboard')
+    res.json(result.recordset)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+
+app.get('/api/top-threat', async (req, res) => {
+  try {
+    const pool = await poolPromise; 
+    const result = await pool.request().execute('sp_GettopTerrorEntity')
+    res.json(result.recordset)
+    
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
