@@ -19,27 +19,43 @@ import OpsLog from './OperationLogs';
 import { WeaknessIntel } from './stubs';
 import './App.css';
 
-const AudioController = ({ audioRef, gameStarted }) => {
+const AudioController = ({ horrorRef, dashboardRef, gameStarted }) => {
     const location = useLocation();
 
     useEffect(() => {
-        const dashboardPaths = ["/", "/ops-log", "/entities", "/artifacts", "/bloodlines", "/hunters", "/locations"];
+        // List of paths that should use the Dashboard music (nightmare.mp3)
+        const dashboardPaths = [
+            "/dashboard", 
+            "/ops-log", 
+            "/entities", 
+            "/artifacts", 
+            "/bloodlines", 
+            "/hunters", 
+            "/locations",
+            "/scout-operation",
+            "/collect-operation"
+        ];
         
-        if (audioRef.current) {
-            // If we move to the Dashboard area, pause the horror music
-            if (dashboardPaths.includes(location.pathname)) {
-                audioRef.current.pause();
-            } else if (gameStarted) {
-                // Play music during Homepage and Selection sequences
-                audioRef.current.play().catch(e => console.log("Audio waiting for user interaction"));
+        const isDashboardPath = dashboardPaths.includes(location.pathname);
+
+        if (gameStarted) {
+            if (isDashboardPath) {
+                // Switch to Dashboard Music
+                horrorRef.current?.pause();
+                dashboardRef.current.volume = 0.3; // Dashboard music usually slightly quieter
+                dashboardRef.current.play().catch(e => console.log("Dashboard audio blocked"));
+            } else {
+                // Switch to Horror/Game Music (Homepage & Selection)
+                dashboardRef.current?.pause();
+                horrorRef.current.volume = 0.4;
+                horrorRef.current.play().catch(e => console.log("Horror audio blocked"));
             }
         }
-    }, [location, gameStarted, audioRef]);
+    }, [location, gameStarted, horrorRef, dashboardRef]);
 
     return null;
 };
 
-// 1. Unified Layout for the Internal Dashboard
 const DashboardLayout = ({ children }) => (
     <div className="app-root">
         <FloatingDock />
@@ -49,9 +65,9 @@ const DashboardLayout = ({ children }) => (
 
 export default function App() {
     const [gameStarted, setGameStarted] = useState(false);
-    const audioRef = useRef(null);
+    const horrorRef = useRef(null);
+    const dashboardRef = useRef(null);
 
-    // If game hasn't started, show only the Landing Page
     if (!gameStarted) {
         return (
             <div className="App">
@@ -60,37 +76,39 @@ export default function App() {
         );
     }
 
-    // Once started, show the Router + Global Audio
     return (
         <BrowserRouter>
             <div className="App">
-                {/* Global Audio Element */}
-                <audio ref={audioRef} src="/assets/audio/castlevania.mp3" loop />
+                {/* GLOBAL AUDIO SOURCES */}
+                <audio ref={horrorRef} src="/assets/audio/castlevania.mp3" loop />
+                <audio ref={dashboardRef} src="/assets/audio/nightmare.mp3" loop />
                 
-                {/* This helper stops the music when entering the Dashboard */}
-                <AudioController audioRef={audioRef} gameStarted={gameStarted} />
+                {/* The brain that decides which music plays */}
+                <AudioController 
+                    horrorRef={horrorRef} 
+                    dashboardRef={dashboardRef} 
+                    gameStarted={gameStarted} 
+                />
 
                 <Routes>
-                    {/* ROOT is now HOMEPAGE (The Horror Terminal) */}
+                    {/* GAME FLOW (Horror Music) */}
                     <Route path="/" element={<Homepage />} />
-                    
-                    {/* Dashboard explicitly moved to /dashboard */}
-                    <Route path="/dashboard" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
-                    
-                    {/* Other Layout-wrapped routes */}
-                    <Route path="/entities" element={<DashboardLayout><EntityRegistry /></DashboardLayout>} />
-                    <Route path="/artifacts" element={<DashboardLayout><ArtifactVault /></DashboardLayout>} />
-                    <Route path="/ops-log" element={<DashboardLayout><OpsLog /></DashboardLayout>} />
-                    <Route path="/hunters" element={<DashboardLayout><Hunters /></DashboardLayout>} />
-                    <Route path="/locations" element={<DashboardLayout><Locations /></DashboardLayout>} />
-
-                    {/* Operation Selection Sequences */}
                     <Route path="/hunter-select" element={<HunterSelection />} />
                     <Route path="/location-select" element={<LocationSelection />} />
                     <Route path="/op-authorize" element={<Authorize />} />
                     <Route path="/initialize" element={<AuthSequence />} />
 
-                    {/* Missions */}
+                    {/* DASHBOARD FLOW (Nightmare Music) */}
+                    <Route path="/dashboard" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
+                    <Route path="/entities" element={<DashboardLayout><EntityRegistry /></DashboardLayout>} />
+                    <Route path="/artifacts" element={<DashboardLayout><ArtifactVault /></DashboardLayout>} />
+                    <Route path="/ops-log" element={<DashboardLayout><OpsLog /></DashboardLayout>} />
+                    <Route path="/bloodlines" element={<DashboardLayout><Bloodlines /></DashboardLayout>} />
+                    <Route path="/weaknesses" element={<DashboardLayout><WeaknessIntel /></DashboardLayout>} />
+                    <Route path="/hunters" element={<DashboardLayout><Hunters /></DashboardLayout>} />
+                    <Route path="/locations" element={<DashboardLayout><Locations /></DashboardLayout>} />
+
+                    {/* Missions (I included these in Dashboard Music as they use the Layout) */}
                     <Route path="/scout-operation" element={<DashboardLayout><ScoutingMission /></DashboardLayout>} />
                     <Route path="/collect-operation" element={<DashboardLayout><CollectionMission /></DashboardLayout>} />
 
