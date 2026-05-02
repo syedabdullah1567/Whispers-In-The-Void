@@ -51,7 +51,7 @@ BEGIN
     ELSE
     BEGIN
         SET @IsAuthorized = 1;
-        SET @Message = 'Authorization Granted: Asset type confirmed for ' + @OperationType + ' at ' + @LocationName + '. Godspeed.';
+        SET @Message = 'Authorization Granted: Asset type confirmed for ' + @OperationType + ' at ' + @LocationName + '. Godspeed soldier.';
     END
 END;
 
@@ -85,18 +85,47 @@ BEGIN
             @hunterID, 
             @locationID, 
             GETDATE(), 
-            'recorded', -- We use 'recorded' for scouting data
+            'Scouting', -- We use 'recorded' for scouting data
             NULL,       -- No specific entity targeted in a scout sweep
             NULL        -- All artifacts updated, so we don't pin one specific ID
         );
+    END    
+END
 
-        PRINT 'MISSION_LOGGED: Sector data updated and operation recorded.';
-    END
-    ELSE
+---------------------------------------------------------------------------------------------------------------
+
+CREATE OR ALTER PROCEDURE CollectionMission
+    @locationID INT,
+    @hunterID INT
+AS
+BEGIN
+    SET NOCOUNT ON; -- Prevents extra 'rows affected' messages from slowing down the API
+
+    UPDATE Artifacts
+    SET status = 'Active'
+    WHERE location_id = @locationID
+    AND status = 'Discovered' 
+
+    -- Logging the operation
+    IF @@ROWCOUNT > 0
     BEGIN
-        PRINT 'SCAN_SKIP: No new artifacts found. Operation not logged.';
-    END
-    
+        INSERT INTO Operations (
+            hunter_id, 
+            location_id, 
+            operation_date, 
+            outcome, 
+            entity_id, 
+            artifact_id
+        )
+        VALUES (
+            @hunterID, 
+            @locationID, 
+            GETDATE(), 
+            'Collection',
+            NULL,       
+            NULL        
+        );
+    END    
 END
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -118,17 +147,16 @@ BEGIN
         origin AS [Origin Point],
         [status] AS [Current Status],
         CASE 
-            WHEN status = 'Unlocated' THEN 'Dormant'
-              WHEN status = 'Discovered' THEN 'Available in Field'
+            WHEN status = 'Discovered' THEN 'Available in Field'
             WHEN status = 'Active' THEN 'Ready to be used'
             WHEN status = 'Used' THEN 'Can no longer be used'
         END AS lifecycleState
 
     FROM Artifacts
-    WHERE location_id = @LocationID
+    WHERE location_id = @LocationID AND status <> 'Unlocated'
     ORDER BY artifact_name ASC;
 END;
-
+  
 ----------------------------------------------------------------------------------------------------------------
 
 -- Procedure For Collecting Artifact ANd updating Hunters Ability
@@ -234,7 +262,7 @@ END
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE PROCEDURE sp_GettopTerrorEntity
+CREATE OR ALTER PROCEDURE sp_GettopTerrorEntity
 AS 
 BEGIN
 
@@ -255,7 +283,7 @@ END
 --------------------------------------------------------------------------------------------------------------------------------------------
 
 -- For Displaying hunter info history for Each hunter
-CREATE PROCEDURE sp_GetHunterLeaderboard
+CREATE OR ALTER PROCEDURE sp_GetHunterLeaderboard
 
 AS 
 BEGIN

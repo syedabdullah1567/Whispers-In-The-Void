@@ -10,6 +10,7 @@ import HunterSelection from './HunterSelection';
 import LocationSelection from './LocationSelection';
 import Bloodlines from './bloodlines';
 import ScoutingMission from './ScoutingMission';
+import CollectionMission from './CollectionMission';
 import EntityRegistry from './EntityRegistry';
 import ArtifactVault from './ArtifactVault'
 import OpsLog from './OperationLogs';
@@ -56,6 +57,8 @@ export default function App() {
         {/* Missions */}
 
         <Route path="/scout-operation" element={<DashboardLayout><ScoutingMission /></DashboardLayout>} />
+        <Route path="/collect-operation" element={<DashboardLayout><CollectionMission /></DashboardLayout>} />
+
 
         {/* Catch-all to redirect to dashboard */}
         <Route path="*" element={<Navigate to="/" />} />

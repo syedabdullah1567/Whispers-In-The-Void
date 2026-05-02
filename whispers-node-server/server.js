@@ -137,6 +137,35 @@ app.post("/api/missions/scout", async (req, res) => {
     }
 });
 
+app.post("/api/missions/collection", async (req, res) => {
+    // 1. Extract locationId (camelCase)
+    const { locationId, hunterId } = req.body;
+
+    try {
+        const pool = await poolPromise;
+        
+        // 2. Use the exact variable 'locationId' we just extracted
+        await pool.request()
+            .input('locationID', sql.Int, locationId) 
+            .input('hunterID', sql.Int, hunterId)
+            .execute('CollectionMission');
+
+        console.log(`Mission Log: Sector ${locationId} collection initiated. Artifacts collected.`);
+
+        res.status(200).json({
+            success: true,
+            message: `MISSION_SUCCESS: SECTOR_${locationId} ARTIFACTS_COLLECTED`
+        });
+    } catch (error) {
+        console.error('Field Operational Error: ', error);
+        res.status(500).json({ 
+            success: false, 
+            message: "UPLINK_FAILURE", 
+            error: error.message 
+        });
+    }
+});
+
 /* ---------------- ENTITY REGISTRY ---------------- */
 app.get('/api/entities', async (req, res) => {
   try {
