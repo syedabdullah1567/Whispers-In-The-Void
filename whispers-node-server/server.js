@@ -220,7 +220,8 @@ app.get('/api/hunter-activity', async (req, res) => {
 app.get('/api/top-threat', async (req, res) => {
   try {
     const pool = await poolPromise; 
-    const result = await pool.request().execute('sp_GettopTerrorEntity')
+    const result = await pool.request()
+    .execute('sp_GettopTerrorEntity')
     res.json(result.recordset)
     
   } catch (err) {
@@ -238,3 +239,104 @@ app.get('/api/operation-log', async(req, res) => {
     res.status(500).json({ error: err.message })
   }
 })
+// Updated to match your Get_Artifacts_At_Location_GamsPlay procedure
+app.get('/api/gameplay/artifacts/:sessionId', async (req, res) => {
+    const { sessionId } = req.params; // Using URL param for SessionID
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('SessionID', sql.Int, sessionId)
+            .execute('Get_Artifacts_At_Location_GamsPlay');
+        res.status(200).json(result.recordset);
+    } catch (err) {
+        console.error("ARTIFACT_FETCH_ERROR:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+app.post('/api/combat/confirm-loadout', async (req, res) => {
+    const { sessionId, artifactId } = req.body;
+    try {
+        const pool = await poolPromise;
+        await pool.request()
+            .input('sessionid', sql.Int, sessionId)
+            .input('artifact_id', sql.Int, artifactId)
+            .execute('sp_artifactselection'); // Executes your stored procedure
+
+        res.status(200).json({ success: true, message: "Loadout confirmed" });
+    } catch (err) {
+        console.error("LOADOUT_ERROR:", err);
+        res.status(500).json({ success: false, message: "Failed to update game log" });
+    }
+});
+
+app.post('/api/combat/start', async (req, res) => {
+    const { hunterId, locationId, entityId } = req.body; // Added locationId
+    try {
+
+        const pool = await poolPromise;
+
+        const result = await pool.request()
+            .input('HunterID', sql.Int, hunterId)
+            .input('LocationID', sql.Int, locationId) // Pass location to the session
+            .input('EntityID', sql.Int, entityId || null) // Can be null now
+            .output('sessionid', sql.Int)
+            .execute('sp_starting_attack');
+        const sessionId = result.output.sessionid;
+        res.status(200).json({
+            success: true,
+            sessionId: sessionId,
+            message: "COMBAT_SESSION_INITIALIZED_PENDING_TARGET"
+        });
+
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+
+});
+
+app.post('/api/combat/assign-entity', async (req, res) => {
+    const { sessionId, entityId, locationId } = req.body;
+    try {
+        const pool = await poolPromise;
+        await pool.request()
+            .input('SessionID', sql.Int, sessionId)
+            .input('EntityID', sql.Int, entityId)
+            .input('LocationID', sql.Int, locationId) // Pass it to the procedure
+            .execute('sp_addingentity_for_attack');
+            res.status(200).json({
+            success: true,
+            message: "TARGET_LOCKED_IN_DATABASE"
+        });
+
+    } catch (err) {
+        console.error("TARGET_LOCK_ERROR:", err.message);
+        res.status(500).json({ success: false, error: err.message });
+    }
+
+});
+
+app.get('/api/locations/:locationId/entities', async (req, res) => {
+    const { locationId } = req.params;
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('LocID', sql.Int, locationId)
+            // MUST use current_lair_id as defined in your CREATE TABLE
+            .query(`
+
+                SELECT
+                    entity_id,
+                    true_name AS entity_name,
+                    terror_index AS threat_level
+                FROM Entities
+                WHERE current_lair_id = @LocID
+                AND existence_state = 'active'
+            `);
+
+        res.json(result.recordset);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
