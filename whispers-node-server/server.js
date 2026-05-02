@@ -79,8 +79,6 @@ app.get("/api/bloodlines", async(req, res) => {
 app.post("/api/authorize", async (req, res) => {
     const { hunterId, locationId } = req.body;
 
-    // const hunterId = 1;
-    // const locationId = 1;
 
     try {
         const pool = await poolPromise;

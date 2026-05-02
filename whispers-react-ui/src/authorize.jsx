@@ -70,6 +70,22 @@ const Authorize = () => {
                     finalData.message += " // RETRIEVE_AUTO_TRIGGER_ERROR";
                 }
             }
+            else if (finalData.authorized && operationType === "Combat") {
+                toast.info("UPLINK GRANTED: INITIALIZING SIGNAL INJECTION...");
+            
+                try {
+                    await axios.post('http://localhost:3000/api/missions/collection', { 
+                        locationId: Number(location.location_id),
+                        hunterId: Number(hunter.hunter_id)
+                    });
+                    
+                    // Modify the message locally to reflect success
+                    finalData.message += " // RETRIEVAL_SATELLITE_UPLINK_LIVE";
+                } catch (scoutErr) {
+                    console.error("Retrieval Mission Trigger Failed:", scoutErr);
+                    finalData.message += " // RETRIEVE_AUTO_TRIGGER_ERROR";
+                }
+            }
 
             setAuthResult(finalData);
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './App.css'; // Uses the horror theme we just built
+import './App.css'; 
 
 export default function AuthSequence() {
   const [logs, setLogs] = useState([]);

@@ -223,3 +223,82 @@ select:focus {
     50% { opacity: 0.3; }
     100% { opacity: 1; }
 }
+
+/* Container for the entire experience */
+.landing-wrapper {
+    height: 100vh;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* The Launcher Icon */
+.game-icon-launcher {
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.3s;
+}
+
+.game-icon-launcher:hover {
+    transform: scale(1.1);
+}
+
+.game-icon-launcher img {
+    width: 150px;
+    height: 150px;
+    border: 2px solid #ff4d4d;
+    box-shadow: 0 0 20px rgba(255, 77, 77, 0.3);
+}
+
+.launch-text {
+    display: block;
+    color: #ff4d4d;
+    font-size: 10px;
+    text-align: center;
+    margin-top: 10px;
+    letter-spacing: 2px;
+}
+
+/* Intro Text */
+.studio-text {
+    color: #eee;
+    letter-spacing: 15px;
+    font-weight: 200;
+}
+
+.game-title {
+    color: #ff4d4d;
+    font-size: 3.5rem;
+    letter-spacing: 8px;
+    text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+    margin-bottom: 50px;
+}
+
+/* Menu Buttons */
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.menu-btn {
+    background: transparent;
+    border: 1px solid #444;
+    color: #888;
+    padding: 15px 40px;
+    width: 250px;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 3px;
+}
+
+.menu-btn:hover {
+    border-color: #ff4d4d;
+    color: #ff4d4d;
+    box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);
+    background: rgba(255, 77, 77, 0.05);
+}
