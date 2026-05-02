@@ -29,31 +29,31 @@ INSERT INTO Bloodlines (bloodline_name, origin_realm, dominant_trait, legacy_thr
 
 -- 3. ENTITIES (The High-Value Targets)
 INSERT INTO Entities (true_name, entity_species, terror_index, existence_state, current_lair_id, bloodline_id) VALUES 
-('Xylo-Thul', 'Void Horror', 10, 'active', 1, 4),
-('Morana Prime', 'Lich', 9, 'active', 4, 4),
-('Valerius the Cruel', 'Vampire', 8, 'active', 1, 1),
-('Glacia', 'Wraith', 6, 'active', 3, 2),
-('Korg the Breaker', 'Ogre', 5, 'active', 3, 3),
-('Morana Echo', 'Lich', 5, 'active', 4, 4),
-('Whisper-in-Walls', 'Poltergeist', 3, 'active', 2, 2),
-('Ignis the Scorched', 'Fire Elemental', 7, 'active', 15, 5),
-('Cthulian Scout', 'Deep One', 6, 'active', 10, 6),
-('Titania''s Shadow', 'Dark Fae', 8, 'active', 3, 7),
-('Unit 734-Omega', 'Cyber-Demon', 9, 'active', 8, 8),
-('The Weeping Lady', 'Banshee', 7, 'active', 6, 2),
-('Goliath Prime', 'Behemoth', 9, 'active', 12, 3),
-('Silas the Flayer', 'Vampire Lord', 9, 'active', 6, 1),
-('Abyssal Leviathan', 'Sea Terror', 10, 'active', 10, 6),
-('Chernobog Aspect', 'Radiation Demon', 9, 'active', 14, 4),
-('The Skinwalker', 'Shapeshifter', 6, 'active', 11, 7),
-('Astro-Lich Kel''Thuz', 'Space Lich', 10, 'active', 9, 4),
-('Yeti King', 'Frost Giant', 7, 'active', 7, 2),
-('Automaton Zeta', 'Rogue AI', 6, 'active', 5, 8),
-('Blood-Baron Vane', 'Vampire', 7, 'active', 13, 1),
-('Magma Wyrm', 'Dragon', 9, 'active', 12, 5),
-('Void-Spawn Alpha', 'Void Horror', 8, 'active', 9, 4),
-('The Rat King', 'Mutant Swarm', 5, 'active', 8, 6),
-('Eldritch Eye', 'Watcher', 8, 'active', 13, 4);
+('Xylo-Thul', 'Void Horror', 10, 'unlocated', 1, 4),
+('Morana Prime', 'Lich', 9, 'unlocated', 4, 4),
+('Valerius the Cruel', 'Vampire', 8, 'unlocated', 1, 1),
+('Glacia', 'Wraith', 6, 'unlocated', 3, 2),
+('Korg the Breaker', 'Ogre', 5, 'unlocated', 3, 3),
+('Morana Echo', 'Lich', 5, 'unlocated', 4, 4),
+('Whisper-in-Walls', 'Poltergeist', 3, 'unlocated', 2, 2),
+('Ignis the Scorched', 'Fire Elemental', 7, 'unlocated', 15, 5),
+('Cthulian Scout', 'Deep One', 6, 'unlocated', 10, 6),
+('Titania''s Shadow', 'Dark Fae', 8, 'unlocated', 3, 7),
+('Unit 734-Omega', 'Cyber-Demon', 9, 'unlocated', 8, 8),
+('The Weeping Lady', 'Banshee', 7, 'unlocated', 6, 2),
+('Goliath Prime', 'Behemoth', 9, 'unlocated', 12, 3),
+('Silas the Flayer', 'Vampire Lord', 9, 'unlocated', 6, 1),
+('Abyssal Leviathan', 'Sea Terror', 10, 'unlocated', 10, 6),
+('Chernobog Aspect', 'Radiation Demon', 9, 'unlocated', 14, 4),
+('The Skinwalker', 'Shapeshifter', 6, 'unlocated', 11, 7),
+('Astro-Lich Kel''Thuz', 'Space Lich', 10, 'unlocated', 9, 4),
+('Yeti King', 'Frost Giant', 7, 'unlocated', 7, 2),
+('Automaton Zeta', 'Rogue AI', 6, 'unlocated', 5, 8),
+('Blood-Baron Vane', 'Vampire', 7, 'unlocated', 13, 1),
+('Magma Wyrm', 'Dragon', 9, 'unlocated', 12, 5),
+('Void-Spawn Alpha', 'Void Horror', 8, 'unlocated', 9, 4),
+('The Rat King', 'Mutant Swarm', 5, 'unlocated', 8, 6),
+('Eldritch Eye', 'Watcher', 8, 'unlocated', 13, 4);
 
 
 -- 4. ARTIFACTS (The Arsenal)
@@ -113,3 +113,5 @@ INSERT INTO Hunters (hunter_name, rank, type, faction) VALUES
 ('Subject Zero', 'Unknown', 'Attacker', 'Classified'),
 ('Finn "Fish" Waters', 'Rookie', 'Collector', 'Aegis Core'),
 ('Reaper-7', 'Master', 'Attacker', 'The Iron Syndicate');
+
+select * from "Entities"
