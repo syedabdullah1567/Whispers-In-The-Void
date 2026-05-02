@@ -74,34 +74,10 @@ CREATE TABLE Weaknesses (
         ON DELETE SET NULL
 );
 
-CREATE TABLE Abilities (
-    ability_id INT IDENTITY(1,1) PRIMARY KEY,
-    ability_name VARCHAR(100) NOT NULL UNIQUE,
-    description VARCHAR(MAX),
-    artifact_id INT,
-    FOREIGN KEY (artifact_id)
-        REFERENCES Artifacts(artifact_id)
-        ON DELETE SET NULL
-);
-
-CREATE TABLE Hunter_Abilities (
-    hunter_ability_id INT IDENTITY(1,1) PRIMARY KEY,
-    hunter_id INT NOT NULL,
-    ability_id INT NOT NULL,
-    unlock_date DATE NOT NULL,
-    FOREIGN KEY (hunter_id)
-        REFERENCES Hunters(hunter_id)
-        ON DELETE CASCADE,
-    FOREIGN KEY (ability_id)
-        REFERENCES Abilities(ability_id)
-        ON DELETE CASCADE,
-    CONSTRAINT uq_hunter_ability UNIQUE (hunter_id, ability_id)
-);
-
 CREATE TABLE Operations (
     operation_id INT IDENTITY(1,1) PRIMARY KEY,
     hunter_id INT NOT NULL,
-    entity_id INT NOT NULL,
+    entity_id INT,
     location_id INT NOT NULL,
     artifact_id INT,
     weakness_id INT,

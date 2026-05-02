@@ -57,21 +57,50 @@ END;
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE PROCEDURE ScoutingMission
-    @locationID INT
+CREATE OR ALTER PROCEDURE ScoutingMission
+    @locationID INT,
+    @hunterID INT
 AS
 BEGIN
     SET NOCOUNT ON; -- Prevents extra 'rows affected' messages from slowing down the API
 
     UPDATE Artifacts
-    SET status = 'Active'
-    WHERE location_id = @locationID 
-    AND status <> 'Active';
+    SET status = 'Discovered'
+    WHERE location_id = @locationID -- Ensure this ID matches exactly
+    AND status <> 'Discovered' 
+    AND status <> 'Used';
+
+    -- Logging the operation
+    IF @@ROWCOUNT > 0
+    BEGIN
+        INSERT INTO Operations (
+            hunter_id, 
+            location_id, 
+            operation_date, 
+            outcome, 
+            entity_id, 
+            artifact_id
+        )
+        VALUES (
+            @hunterID, 
+            @locationID, 
+            GETDATE(), 
+            'recorded', -- We use 'recorded' for scouting data
+            NULL,       -- No specific entity targeted in a scout sweep
+            NULL        -- All artifacts updated, so we don't pin one specific ID
+        );
+
+        PRINT 'MISSION_LOGGED: Sector data updated and operation recorded.';
+    END
+    ELSE
+    BEGIN
+        PRINT 'SCAN_SKIP: No new artifacts found. Operation not logged.';
+    END
+    
 END
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
   
-GO
 CREATE OR ALTER PROCEDURE Get_Artifacts_At_Location
     @LocationID INT
 AS
@@ -103,7 +132,7 @@ END;
 ----------------------------------------------------------------------------------------------------------------
 
 -- Procedure For Collecting Artifact ANd updating Hunters Ability
-CREATE PROCEDURE sp_CollectArtifact
+CREATE OR ALTER PROCEDURE sp_CollectArtifact
     @Artifact_ID INT,
     @Hunter_ID INT,
     @Returning_Message VARCHAR(50) OUTPUT
@@ -140,17 +169,108 @@ END;
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 
-DECLARE @msg VARCHAR(50)
+CREATE OR ALTER PROCEDURE sp_DashBoard_cards
+    @EntityCount INT OUTPUT,
+    @ActiveEntity INT OUTPUT,
+    @OpCount INT OUTPUT,
+    @OpRecorded INT OUTPUT,
+    @CountDeployedHunters INT OUTPUT,
+    @LocationExplored INT OUTPUT,
+    @TotalArtifacts INT OUTPUT,
+    @ArtifactsUnlocked INT OUTPUT
+AS 
+BEGIN
+    
+    -- Total Entity Count
+    SELECT @EntityCount = count(*)
+    FROM Entities
 
-EXEC sp_CollectArtifact 
-    @Artifact_ID = 3, 
-    @Hunter_ID = 2, 
-    @Returning_Message = @msg OUTPUT
+    -- Active Entity Count
+    SELECT @ActiveEntity = count(*)
+    FROM Entities E
+    WHERE E.existence_state = 'active';
 
-SELECT @msg AS Result
+    -- Ops Count
+    Select @OpCount = count( * ) from Operations
+
+    -- Recorded OPs Count
+    Select @OpRecorded = count( * ) 
+    From Operations O
+    WHERE O.outcome = 'recorded';
+
+    -- Deployed Hunters
+    Select @CountDeployedHunters = COUNT(DISTINCT(hunter_id))
+    From Operations O
+
+    -- Locations Explored
+    Select @LocationExplored = COUNT(DISTINCT(O.location_id))
+    From Operations O
 
 
-Select * from Hunter_Abilities
-  
+    -- Total Artifacts
+    SELECT @TotalArtifacts =  COUNT(*)
+    FROM Artifacts;
 
-SELECT * FROM "Artifacts"
+
+    -- Artifacts Unlocked
+
+    SELECT @ArtifactsUnlocked = COUNT(*)
+    FROM Artifacts
+    Where status = 'Discovered'
+
+END
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR ALTER PROCEDURE sp_EntityRegistry
+AS 
+BEGIN
+
+    Select E.true_name,E.entity_species,E.terror_index,E.existence_state,L.location_name,B.bloodline_name from Entities As E
+    left join Locations as L on L.location_id = E.current_lair_id
+    left join Bloodlines as B on B.bloodline_id = E.bloodline_id
+
+END
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE PROCEDURE sp_GettopTerrorEntity
+AS 
+BEGIN
+
+    Select E.true_name,E.entity_species,E.terror_index,E.existence_state,L.location_name,B.bloodline_name from Entities AS E
+    join Locations AS L on L.location_id = E.current_lair_id
+    join Bloodlines As B on B.bloodline_id = E.bloodline_id
+
+    where E.entity_id = (
+    
+        Select top 1 e.entity_id
+        from Entities as e
+        order by terror_index DESC
+
+    )
+
+END
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+-- For Displaying hunter info history for Each hunter
+CREATE PROCEDURE sp_GetHunterLeaderboard
+
+AS 
+BEGIN
+    SELECT 
+        h.hunter_name, h.rank, h.faction,
+        COUNT(CASE WHEN o.outcome = 'neutralized' THEN 1 END) AS neutralized_count,
+        COUNT(CASE WHEN o.outcome = 'archived'    THEN 1 END) AS archived_count,
+        COUNT(CASE WHEN o.outcome = 'recorded'    THEN 1 END) AS recorded_count,
+        COUNT(o.operation_id) AS total_operations
+
+    FROM Hunters as h
+    LEFT JOIN Operations as o ON h.hunter_id = o.hunter_id
+    GROUP BY h.hunter_id, h.hunter_name, h.rank, h.faction
+    ORDER BY neutralized_count DESC
+
+END;
+
+-----------------------------------------------------------------------------------------------------------------------------------------------

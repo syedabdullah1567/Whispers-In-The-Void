@@ -43,7 +43,8 @@ const Authorize = () => {
             
                 try {
                     await axios.post('http://localhost:3000/api/missions/scout', { 
-                        locationId: Number(location.location_id) 
+                        locationId: Number(location.location_id),
+                        hunterId: Number(hunter.hunter_id)
                     });
                     
                     // Modify the message locally to reflect success

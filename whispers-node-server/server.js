@@ -110,7 +110,7 @@ app.post("/api/authorize", async (req, res) => {
 
 app.post("/api/missions/scout", async (req, res) => {
     // 1. Extract locationId (camelCase)
-    const { locationId } = req.body; 
+    const { locationId, hunterId } = req.body;
 
     try {
         const pool = await poolPromise;
@@ -118,6 +118,7 @@ app.post("/api/missions/scout", async (req, res) => {
         // 2. Use the exact variable 'locationId' we just extracted
         await pool.request()
             .input('locationID', sql.Int, locationId) 
+            .input('hunterID', sql.Int, hunterId)
             .execute('ScoutingMission');
 
         console.log(`Mission Log: Sector ${locationId} scanning initiated. Artifacts active.`);
@@ -193,6 +194,17 @@ app.get('/api/top-threat', async (req, res) => {
   try {
     const pool = await poolPromise; 
     const result = await pool.request().execute('sp_GettopTerrorEntity')
+    res.json(result.recordset)
+    
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get('/api/operation-log', async(req, res) => {
+    try {
+    const pool = await poolPromise; 
+    const result = await pool.request().query('SELECT * FROM Operations')
     res.json(result.recordset)
     
   } catch (err) {
