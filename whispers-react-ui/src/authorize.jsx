@@ -172,7 +172,7 @@ const Authorize = () => {
                                 className="terminal-btn mt-20" 
                                 onClick={() => {
                                     if (authResult.authorized) {
-                                        navigate("/"); 
+                                        navigate("/dashboard"); 
                                     } else {
                                         navigate("/hunter-select");
                                     }

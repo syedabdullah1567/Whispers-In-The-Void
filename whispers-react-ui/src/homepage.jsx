@@ -3,29 +3,13 @@ import { useNavigate } from 'react-router-dom';
 
 const Homepage = () => {
     const navigate = useNavigate();
-    const audioRef = useRef(null);
-
-    // Function to start audio (triggered by the container click or hover)
-    const startAmbience = () => {
-        if (audioRef.current) {
-            audioRef.current.volume = 0.4;
-            audioRef.current.play().catch(e => console.log("Audio waiting for interaction"));
-        }
-    };
 
     return (
         <div 
             className="horror-root" 
-            onClick={startAmbience}
-            onMouseEnter={startAmbience}
+            
         >
-            {/* BACKGROUND AUDIO BOILERPLATE */}
-            {/* Place your .mp3 file in the 'public/assets/audio/' folder */}
-            <audio 
-                ref={audioRef} 
-                src="/assets/audio/castlevania.mp3" 
-                loop 
-            />
+
 
             <div className="vignette"></div>
             <div className="scanlines"></div>
