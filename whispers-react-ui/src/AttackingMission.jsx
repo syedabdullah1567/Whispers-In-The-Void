@@ -75,8 +75,6 @@ const AttackingMission = () => {
             });
 
             toast.success("SYSTEM_SYNC: LOADOUT REGISTERED");
-            
-          
             navigate('/combat-resolution', { 
                 state: { ...state, selectedEntity, selectedArtifact } 
             });
@@ -251,28 +249,77 @@ const AttackingMission = () => {
 
                 @keyframes scanline { 0% { transform: translateY(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
                 @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-            
-            .artifact-card.selected { 
-                    border-color: #ff4d4d; 
-                    box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);
-                    transform: scale(1.02);
+           
+                .artifact-card { 
+                    background: #0a0a0a; 
+                    border: 1px solid #1a1a1a; 
+                    padding: 0; 
+                    position: relative;
+                    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); /* Smooth easing */
+                    overflow: hidden;
                 }
-                
+
+                .artifact-card:hover {
+                    border-color: #333;
+                    background: #0f0f0f;
+                }
+
+                /* THE SELECTION STATE */
+                .artifact-card.selected { 
+                    border-color: #ff4d4d; 
+                    background: #140a0a; /* Slight red tint to background */
+                    box-shadow: 0 0 25px rgba(255, 77, 77, 0.15), inset 0 0 10px rgba(255, 77, 77, 0.05);
+                    transform: translateY(-5px) scale(1.02); /* Lift effect */
+                    z-index: 2;
+                }
+
+                /* Badge Transition */
+                .category-badge {
+                    transition: all 0.3s ease;
+                }
+
                 .artifact-card.selected .category-badge {
-                    background: rgba(255, 77, 77, 0.1);
+                    background: rgba(255, 77, 77, 0.2);
                     border-color: #ff4d4d;
                     color: #ff4d4d;
+                    letter-spacing: 1px;
+                }
+
+                /* Visual Glow Animation */
+                .artifact-visual {
+                    transition: background 0.5s ease;
+                }
+
+                .artifact-card.selected .artifact-visual {
+                    background: radial-gradient(circle, rgba(255, 77, 77, 0.2) 0%, #000 100%);
+                }
+
+                .artifact-card.selected .glow-circle {
+                    border-color: rgba(255, 77, 77, 0.5);
+                    transform: translate(-50%, -50%) scale(1.5);
+                    transition: all 0.6s ease;
+                }
+
+                /* Progress Bar "Charging" Animation */
+                .progress-track .fill {
+                    width: 0%; 
+                    transition: width 0.8s cubic-bezier(0.65, 0, 0.35, 1), background 0.3s ease;
                 }
 
                 .artifact-card.selected .fill {
                     background: #ff4d4d !important;
                     width: 100% !important;
-                    box-shadow: 0 0 10px #ff4d4d;
+                    box-shadow: 0 0 15px #ff4d4d;
+                    animation: pulseGlow 2s infinite;
                 }
 
-                .artifact-card.selected .artifact-visual {
-                    background: radial-gradient(circle, rgba(255, 77, 77, 0.1) 0%, #000 100%);
+                /* Keyframes for a "living" UI feel */
+                @keyframes pulseGlow {
+                    0% { opacity: 0.8; box-shadow: 0 0 5px #ff4d4d; }
+                    50% { opacity: 1; box-shadow: 0 0 15px #ff4d4d; }
+                    100% { opacity: 0.8; box-shadow: 0 0 5px #ff4d4d; }
                 }
+
            `}</style>
         </div>
     );
