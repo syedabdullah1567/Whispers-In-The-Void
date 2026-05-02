@@ -71,7 +71,7 @@ const OperationLogs = () => {
                         {/* Mission Details */}
                         <div style={{ marginTop: '15px' }}>
                             <div className="stat-val" style={{ fontSize: '18px', textTransform: 'uppercase', color: '#eee' }}>
-                                {log.location_name || 'Classified Location'}
+                                {'Sector ' + log.location_id || 'Classified Location'}
                             </div>
                             <div className="stat-lbl" style={{ marginTop: '5px', color: '#ba7517', fontSize: '11px', fontWeight: 'bold' }}>
                                 OPERATIVE: {log.hunter_name || `UNIT_${log.hunter_id}`}

@@ -83,7 +83,7 @@ CREATE TABLE Operations (
     weakness_id INT,
     operation_date DATE NOT NULL,
     outcome VARCHAR(20) NOT NULL
-        CHECK (outcome IN ('recorded', 'neutralized', 'archived')),
+        CHECK (outcome IN ('Scouting', 'Collection', 'Attacking')),
     FOREIGN KEY (hunter_id)
         REFERENCES Hunters(hunter_id)
         ON DELETE CASCADE,
