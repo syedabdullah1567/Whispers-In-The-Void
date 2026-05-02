@@ -28,7 +28,10 @@ export default function HunterSelection() {
 
             <div className="card-container">
                 {hunters.map(h => (
-                    <div key={h.hunter_id} className="hunter-pokemon-card" onClick={() => navigate('/location-select', { state: { hunter: h } })}>
+                    <div key={h.hunter_id} className="hunter-pokemon-card" 
+                    onClick={() => navigate('/location-select', 
+                    { state: { hunter: h } })
+                    }>
                         <div className="card-inner">
                             {/* Rank from Schema */}
                             <div className="card-rank">RK_{h.rank}</div>
