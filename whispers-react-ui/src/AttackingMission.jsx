@@ -1,141 +1,281 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './App.css';
+import { toast, ToastContainer } from 'react-toastify';
 
 const AttackingMission = () => {
-    const [locations, setLocations] = useState([]);
-    const [status, setStatus] = useState('IDLE'); // IDLE, SCANNING, SUCCESS, ERROR
-    const [loading, setLoading] = useState(true);
+    const { state } = useLocation();
+    const navigate = useNavigate();
+    const [showSplash, setShowSplash] = useState(true);
 
-    // Fetch locations to know which sectors can be scouted
+    const { location, sessionId } = state || {};
+
+    const [entities, setEntities] = useState([]);
+    const [artifacts, setArtifacts] = useState([]);
+    const [view, setView] = useState('entity'); // 'entity' or 'artifact'
+    const [selectedEntity, setSelectedEntity] = useState(null);
+    const [selectedArtifact, setSelectedArtifact] = useState(null);
+
     useEffect(() => {
-        const fetchSectors = async () => {
+        const timer = setTimeout(() => setShowSplash(false), 2500);
+
+        if (!location?.location_id) return () => clearTimeout(timer);
+
+        const fetchEntities = async () => {
             try {
-                const res = await axios.get("http://localhost:3000/api/locations");
-                setLocations(res.data.locationData);
+                const res = await axios.get(
+                    `http://localhost:3000/api/locations/${location.location_id}/entities`
+                );
+                setEntities(res.data);
             } catch (err) {
-                console.error("DATA_LINK_SEVERED", err);
-            } finally {
-                setLoading(false);
+                toast.error("SCAN_ERROR: ENTITY SIGNATURES NOT DETECTED");
             }
         };
-        fetchSectors();
-    }, []);
 
-    const initiateScouting = async (locationID) => {
-        setStatus('SCANNING');
-        
+        fetchEntities();
+        return () => clearTimeout(timer);
+    }, [location]);
+
+    const handleLockTarget = async (entity) => {
         try {
-            // Calling the Node.js endpoint we just created
-            const response = await axios.post('http://localhost:3000/api/missions/scout', { 
-                locationId: locationID 
+            await axios.post('http://localhost:3000/api/combat/assign-entity', {
+                sessionId: Number(sessionId),
+                entityId: Number(entity.entity_id),
+                locationId: Number(location.location_id)
             });
-
-            if (response.data.success) {
-                setStatus('SUCCESS');
-                // Reset to idle after 3 seconds to allow more scouting
-                setTimeout(() => setStatus('IDLE'), 3000);
-            }
-        } catch (error) {
-            console.error("SCOUTING_CRITICAL_FAILURE", error);
-            setStatus('ERROR');
-            setTimeout(() => setStatus('IDLE'), 5000);
+            
+            setSelectedEntity(entity);
+            toast.success(`TARGET_LOCKED: ${entity.entity_name}`);
+            fetchLocationArtifacts();
+        } catch (err) {
+            toast.error("DATABASE_LINK_FAILURE: TARGET NOT REGISTERED");
         }
     };
 
-    if (loading) return <div className="glitch-text" 
-    style={{textAlign: 'center', marginTop: '20%'}}>
-    LOCALIZING SECTORS...</div>;
+    const fetchLocationArtifacts = async () => {
+        try {
+            const res = await axios.get(`http://localhost:3000/api/gameplay/artifacts/${sessionId}`);
+            setArtifacts(res.data);
+            setView('artifact');
+        } catch (err) {
+            toast.error("ARTIFACT_ARCHIVE_ACCESS_DENIED");
+        }
+    };
+
+    const handleFinalEngagement = async () => {
+        if (!selectedArtifact) {
+            toast.warn("NO_ARTIFACT_LOADED: SELECT A RELIC TO PROCEED");
+            return;
+        }
+
+        try {
+            await axios.post('http://localhost:3000/api/combat/confirm-loadout', {
+                sessionId: Number(sessionId),
+                artifactId: Number(selectedArtifact.ID) // Matches your artifact object property
+            });
+
+            toast.success("SYSTEM_SYNC: LOADOUT REGISTERED");
+            
+          
+            navigate('/combat-resolution', { 
+                state: { ...state, selectedEntity, selectedArtifact } 
+            });
+        } catch (err) {
+            toast.error("CRITICAL_FAILURE: DATABASE LINK INTERRUPTED");
+        }
+    };
 
     return (
-        <div className="main-content">
-            <div className="topbar">
-                <div>
-                    <div className="topbar-title">Scouting Protocol</div>
-                    <div className="topbar-sub">Artifact Activation // Signal Injection</div>
-                </div>
-                <span className={`status-pill ${status === 'SCANNING' ? 'pulse' : ''}`}>
-                    {status}
-                </span>
-            </div>
-
-            {status === 'SCANNING' && (
-                <div className="scanning-overlay">
-                    <div className="glitch-text">TRANSMITTING SIGNAL TO SATELLITE...</div>
-                    <div className="progress-bar-container">
-                        <div className="progress-bar-fill"></div>
+        <div className="mission-terminal">
+            {showSplash && (
+                <div className="mission-splash">
+                    <div className="splash-content">
+                        <div className="top-line">SYSTEM_INITIALIZED // SESSION_{sessionId}</div>
+                        <h1 className="mission-title">MISSION STARTED</h1>
+                        <div className="location-ping">DEPLOYING TO: {location?.location_name}</div>
+                        <div className="scan-bar"></div>
+                        <div className="bottom-line">SCANNING FOR ENTITY SIGNATURES...</div>
                     </div>
                 </div>
             )}
-
-            <div className="grid-container" style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-                gap: '20px' 
-            }}>
-                {locations.map(loc => (
-                    <div key={loc.location_id} className="stat-card">
-                        <div className="stat-lbl">SECTOR_{loc.location_id}</div>
-                        <div className="stat-val" style={{fontSize: '20px'}}>{loc.location_name}</div>
-                        <div className="stat-lbl" style={{color: '#444', marginBottom: '15px'}}>{loc.location_type}</div>
-                        
-                        <button 
-                            className="terminal-btn"
-                            disabled={status === 'SCANNING'}
-                            onClick={() => initiateScouting(loc.location_id)}
-                            style={{ width: '100%', marginTop: 'auto' }}
-                        >
-                            INITIATE SCOUT
-                        </button>
+            
+            <ToastContainer theme="dark" />
+            
+            <div className="header-ui">
+                <div className="status-tag">SESSION: {sessionId}</div>
+                <div className="status-tag">LOC: {location?.location_name}</div>
+                {selectedEntity && (
+                    <div className="status-tag" style={{borderColor: '#ff4d4d'}}>
+                        LOCKED: {selectedEntity.entity_name}
                     </div>
-                ))}
+                )}
             </div>
 
+            {view === 'entity' ? (
+                <div className="section">
+                    <h2 className="glitch">TARGET ACQUISITION</h2>
+                    <div className="grid">
+                        {entities.map(ent => (
+                            <div key={ent.entity_id} className="card target-card" onClick={() => handleLockTarget(ent)}>
+                                <div className="label">ENTITY_TYPE</div>
+                                <div className="name">{ent.entity_name}</div>
+                                <div className="threat">THREAT_LVL: {ent.threat_level}</div>
+                                <div className="action-hint">CLICK TO LOCK SIGNATURE</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : (<div className="section">
+                    <h2 className="glitch" style={{ color: '#00d2ff' }}>ARTIFACT LOADOUT</h2>
+                    
+                    <div className="grid">
+                        {artifacts.map((art) => {
+                            // Check if this card is the one currently in the selection state
+                            // Ensure art.ID matches the property name coming from your API
+                            const isSelected = selectedArtifact?.ID === art.ID;
+
+                            return (
+                                <div
+                                    key={art.ID}
+                                    className={`card artifact-card ${isSelected ? 'selected' : ''}`}
+                                    onClick={() => setSelectedArtifact(art)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <div className="category-badge">
+                                        {isSelected ? '[ LOADED ]' : (art.Classification || 'RELIC')}
+                                    </div>
+                                    
+                                    <div className="artifact-visual">
+                                        <div className="glow-circle"></div>
+                                    </div>
+                                    
+                                    <div className="artifact-info">
+                                        <div className="name">{art["Artifact Name"]}</div>
+                                        <div className="origin">ORIGIN: {art["Origin Point"]}</div>
+                                    </div>
+                                    
+                                    <div className="artifact-footer">
+                                        <div className="status-row">
+                                            <span>STATUS</span>
+                                            <span className="val">{art["Current Status"]}</span>
+                                        </div>
+                                        <div className="progress-track">
+                                            <div className={`fill ${isSelected ? 'active' : ''}`}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Use the handleFinalEngagement function we created to ensure the DB updates before navigating */}
+                    <button className="engage-btn" onClick={handleFinalEngagement}>
+                        INITIALIZE ENGAGEMENT
+                    </button>
+                </div>
+            )}
             <style>{`
-                .scanning-overlay {
-                    background: rgba(0,0,0,0.9);
-                    border: 1px solid #ff4d4d;
-                    padding: 20px;
-                    margin-bottom: 20px;
-                    text-align: center;
+                .mission-terminal { 
+                    background: #0d0d0d; color: #888; min-height: 100vh; padding: 40px; 
+                    font-family: 'JetBrains Mono', monospace; 
                 }
-                .progress-bar-container {
-                    height: 2px;
-                    background: #111;
-                    margin-top: 15px;
-                    overflow: hidden;
+                
+                .header-ui { display: flex; gap: 20px; border-bottom: 1px solid #1a1a1a; padding-bottom: 20px; margin-bottom: 40px; }
+                
+                .status-tag { 
+                    font-size: 11px; background: #111; padding: 6px 14px; border: 1px solid #333;
+                    border-left: 3px solid #ff4d4d; color: #eee; text-transform: uppercase; letter-spacing: 2px;
                 }
-                .progress-bar-fill {
-                    height: 100%;
-                    background: #ff4d4d;
-                    width: 30%;
-                    animation: loading-bar 2s infinite linear;
+
+                .glitch { color: #ff4d4d; text-transform: uppercase; letter-spacing: 5px; font-size: 24px; margin-bottom: 30px; }
+
+                .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+
+                /* TARGET CARDS (image_a38686.png Style) */
+                .target-card { 
+                    background: #151515; padding: 30px; border-left: 4px solid #ff4d4d; cursor: pointer; transition: 0.2s;
                 }
-                @keyframes loading-bar {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(400%); }
+                .target-card:hover { background: #1c1c1c; transform: translateX(5px); }
+                .target-card .label { font-size: 10px; color: #ff4d4d; margin-bottom: 8px; }
+                .target-card .name { font-size: 24px; color: #fff; margin-bottom: 10px; }
+                .target-card .threat { color: #666; font-size: 12px; }
+                .target-card .action-hint { font-size: 9px; margin-top: 15px; color: #444; }
+
+                /* ARTIFACT CARDS (image_a325fe.png Style) */
+                .artifact-card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 0; position: relative; }
+                .artifact-card.selected { border-color: #ff4d4d; }
+                .category-badge { 
+                    background: rgba(0, 210, 255, 0.1); border: 1px solid #00d2ff; 
+                    color: #00d2ff; font-size: 10px; padding: 4px 10px; margin: 15px; display: inline-block;
                 }
-                .terminal-btn {
-                    background: transparent;
-                    border: 1px solid #ff4d4d;
+                .artifact-visual { 
+                    height: 120px; background: radial-gradient(circle, #00d2ff10 0%, #000 100%); 
+                    margin: 0 15px; border: 1px solid #1a1a1a; position: relative; overflow: hidden;
+                }
+                .glow-circle {
+                    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    width: 40px; height: 40px; border: 2px solid #00d2ff20; border-radius: 50%;
+                }
+                .artifact-info { padding: 20px 15px; }
+                .artifact-info .name { color: #00d2ff; font-size: 18px; }
+                .artifact-info .origin { font-size: 10px; color: #555; }
+                .artifact-footer { padding: 15px; border-top: 1px solid #1a1a1a; }
+                .status-row { display: flex; justify-content: space-between; font-size: 9px; margin-bottom: 5px; }
+                .status-row .val { color: #00d2ff; }
+                .progress-track { height: 3px; background: #111; width: 100%; margin: 5px 0; }
+                .progress-track .fill { height: 100%; background: #00d2ff; width: 60%; box-shadow: 0 0 10px #00d2ff; }
+                .avail-text { font-size: 8px; color: #333; text-align: right; margin-top: 5px; }
+
+                /* SPLASH SCREEN */
+                .mission-splash {
+                    position: fixed; inset: 0; background: #0a0a0a; display: flex;
+                    justify-content: center; align-items: center; z-index: 9999;
+                    animation: fadeOut 0.4s ease 2.2s forwards;
+                }
+                .splash-content {
+                    width: 450px; padding: 40px; border-left: 8px solid #ff4d4d; background: #111; position: relative;
+                }
+                .mission-title { font-size: 32px; color: #ff4d4d; letter-spacing: 4px; margin: 10px 0; }
+                .top-line { color: #eee; font-size: 12px; }
+                .location-ping { color: #fff; font-size: 18px; margin: 10px 0; }
+                .scan-bar { 
+                    height: 2px; background: #ff4d4d; width: 100%; position: absolute; 
+                    left: 0; bottom: 0; animation: scanline 2s linear infinite; 
+                }
+
+                .engage-btn { 
+                    width: 100%; margin-top: 30px; padding: 20px; background: #ff4d4d; 
+                    color: #fff; border: none; font-weight: bold; cursor: pointer; 
+                    text-transform: uppercase; letter-spacing: 3px;
+                }
+
+                @keyframes scanline { 0% { transform: translateY(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
+                @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+            
+            .artifact-card.selected { 
+                    border-color: #ff4d4d; 
+                    box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);
+                    transform: scale(1.02);
+                }
+                
+                .artifact-card.selected .category-badge {
+                    background: rgba(255, 77, 77, 0.1);
+                    border-color: #ff4d4d;
                     color: #ff4d4d;
-                    padding: 10px;
-                    font-family: 'JetBrains Mono', monospace;
-                    cursor: pointer;
-                    transition: all 0.3s;
                 }
-                .terminal-btn:hover:not(:disabled) {
-                    background: #ff4d4d;
-                    color: #000;
-                    box-shadow: 0 0 15px #ff4d4d;
+
+                .artifact-card.selected .fill {
+                    background: #ff4d4d !important;
+                    width: 100% !important;
+                    box-shadow: 0 0 10px #ff4d4d;
                 }
-                .terminal-btn:disabled {
-                    opacity: 0.3;
-                    cursor: not-allowed;
+
+                .artifact-card.selected .artifact-visual {
+                    background: radial-gradient(circle, rgba(255, 77, 77, 0.1) 0%, #000 100%);
                 }
-            `}</style>
+           `}</style>
         </div>
     );
 };
 
-export default ScoutingMission;
+export default AttackingMission;
