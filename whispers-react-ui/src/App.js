@@ -12,8 +12,8 @@ import Bloodlines from './bloodlines';
 import ScoutingMission from './ScoutingMission';
 import EntityRegistry from './EntityRegistry';
 import ArtifactVault from './ArtifactVault'
+import OpsLog from './OperationLogs';
 import {
-  OpsLog,
   WeaknessIntel,
 } from './stubs'; // Removed /pages/
 import './App.css';

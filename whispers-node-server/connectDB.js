@@ -2,7 +2,7 @@ const sql = require('mssql');
 
 const config = {
   user: 'sa',
-  password: 'SqlPass123!',
+  password: '3*IdioticIdiots*',
   server: 'localhost',
   database: 'Whispers in the Void',
   port: 1433,

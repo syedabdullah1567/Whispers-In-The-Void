@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
+import { useLocation } from 'react-router-dom';
 
 const ScoutingMission = () => {
+    const { state } = useLocation(); // Hook into the navigation state
     const [locations, setLocations] = useState([]);
-    const [status, setStatus] = useState('IDLE'); // IDLE, SCANNING, SUCCESS, ERROR
+    const [status, setStatus] = useState('IDLE');
     const [loading, setLoading] = useState(true);
 
+    // Grab the hunter from the state passed during navigation
+    const activeHunter = state?.hunter;
     // Fetch locations to know which sectors can be scouted
     useEffect(() => {
         const fetchSectors = async () => {
             try {
                 const res = await axios.get("http://localhost:3000/api/locations");
-                setLocations(res.data.locationData);
+                // Ensure we access the correct data key from your backend
+                setLocations(res.data.locationData || res.data); 
             } catch (err) {
                 console.error("DATA_LINK_SEVERED", err);
             } finally {
@@ -23,24 +28,26 @@ const ScoutingMission = () => {
     }, []);
 
     const initiateScouting = async (locationID) => {
-        setStatus('SCANNING');
-        
+    setStatus('SCANNING');
+    
         try {
-            // Calling the Node.js endpoint we just created
             const response = await axios.post('http://localhost:3000/api/missions/scout', { 
-                locationId: locationID 
+                locationId: locationID,
+                hunterId: activeHunter.hunter_id 
             });
 
             if (response.data.success) {
                 setStatus('SUCCESS');
-                // Reset to idle after 3 seconds to allow more scouting
+                
+                // FIX: Re-fetch locations/artifacts immediately after success
+                const refresh = await axios.get("http://localhost:3000/api/locations");
+                setLocations(refresh.data.locationData || refresh.data);
+
                 setTimeout(() => setStatus('IDLE'), 3000);
             }
         } catch (error) {
-            console.error("SCOUTING_CRITICAL_FAILURE", error);
             setStatus('ERROR');
-            setTimeout(() => setStatus('IDLE'), 5000);
-        }
+        }   
     };
 
     if (loading) return <div className="glitch-text" style={{textAlign: 'center', marginTop: '20%'}}>LOCALIZING SECTORS...</div>;
@@ -135,5 +142,6 @@ const ScoutingMission = () => {
         </div>
     );
 };
+
 
 export default ScoutingMission;
