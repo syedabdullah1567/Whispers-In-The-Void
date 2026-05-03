@@ -84,7 +84,7 @@ CREATE TABLE Weaknesses (
 
 CREATE TABLE Operations (
     operation_id INT IDENTITY(1,1) PRIMARY KEY,
-    hunter_id INT NOT NULL,
+    hunter_id INT,
     entity_id INT,
     location_id INT NOT NULL,
     artifact_id INT,

@@ -8,17 +8,15 @@ CREATE OR ALTER PROCEDURE sp_FireRandomPenalty
     @hunter_id INT
 AS
 BEGIN
-    DECLARE @random INT = FLOOR(RAND() * 3) + 1
+    DECLARE @random INT = FLOOR(RAND() * 2) + 1
 
     IF @random = 1
         EXEC sp_PenaltyLoseArtifact @hunter_id
-    ELSE IF @random = 2
-        EXEC sp_PenaltySpawnEntity @hunter_id
     ELSE
         EXEC sp_PenaltyResurrectEntity @hunter_id
 END
 
-
+SELECT * FROM 
 
 ----------- Penalty Type 1 Artifact Reset
 
@@ -66,90 +64,6 @@ EXEC sp_PenaltyLoseArtifact @hunter_id = 2
 
 -- check artifact was reset
 SELECT artifact_id, artifact_name, status FROM Artifacts
-
--- check penalty was logged
-SELECT * FROM Penalties
-
-
-
-
------------ Penalty Type 2 Spawn Entity
-
-CREATE OR ALTER PROCEDURE sp_PenaltySpawnEntity
-    @hunter_id INT
-AS
-BEGIN
-    DECLARE @Loc_id INT = NULL
-    DECLARE @Entity_Species VARCHAR(50) = ''
-    DECLARE @Terror_Index INT = NULL
-    DECLARE @Bloodline INT = NULL
-
-    DECLARE @count INT = 0
-    SELECT @count = COUNT(*) FROM Entities WHERE true_name LIKE 'Manifested Anomaly%'
-
-
-    DECLARE @entity_name VARCHAR(100) = 
-    CASE 
-        WHEN @count = 0 THEN 'Manifested Anomaly'
-        ELSE 'Manifested Anomaly ' + CAST(@count + 1 AS VARCHAR)
-    END
-
-    -- Location of Anomaly
-    SELECT TOP 1 @Loc_id = location_id
-    FROM Locations
-    WHERE risk_level >= 6
-    ORDER BY NEWID()
-
-
-    IF @Loc_id IS NULL
-    BEGIN
-            SELECT TOP 1 @Loc_id = location_id
-            FROM Locations
-            ORDER BY risk_level DESC
-    END
-
-    -- Species of the Anomaly
-    SELECT TOP 1 @Entity_Species = entity_species
-    FROM Entities
-    ORDER BY NEWID()
-
-    -- Terror Index of Anomaly
-    SET @Terror_Index = FLOOR(RAND() * 5) + 6
-
-    -- BloodLine of Anomaly
-    SELECT TOP 1 @Bloodline = bloodline_id
-    FROM Bloodlines
-    ORDER BY NEWID()
-
-
-
-    BEGIN TRANSACTION
-
-    -- Insertion of Entity
-
-    INSERT INTO Entities (true_name, entity_species, terror_index, existence_state, current_lair_id, bloodline_id) VALUES 
-    (@entity_name , @Entity_Species, @Terror_Index, 'active', @Loc_id, @Bloodline)
-
-    DECLARE @Entity_id INT = SCOPE_IDENTITY();
-
-    INSERT INTO Penalties (hunter_id, penalty_type, penalty_description, affected_id)
-    SELECT @hunter_id, penalty_type, description, @Entity_id
-    FROM PenaltyTypes
-    WHERE penalty_type = 'EntitySpawned'
-
-    COMMIT
-
-
-    SELECT 'Anomaly spawned: ' + @Entity_Species + ' with terror index ' + CAST(@Terror_Index AS VARCHAR) AS message
-
-
-END
-
-
-EXEC sp_PenaltySpawnEntity @hunter_id = 2
-
--- check new entity was created
-SELECT * FROM Entities 
 
 -- check penalty was logged
 SELECT * FROM Penalties

@@ -84,7 +84,7 @@ GO
 CREATE OR ALTER PROCEDURE sp_artifactselection 
 @sessionid int,
 @artifact_id int,
-@riddle_solved bit = 1
+@riddle_solved bit DEFAULT 1
 AS 
 BEGIN 
     update ATTACKER_GAME_LOG
@@ -116,14 +116,14 @@ BEGIN
 
     SELECT @artifact_power = ISNULL(artifact_power, 0) FROM Artifacts WHERE artifact_id = @artifact_id;
     SELECT @hunterrank = ISNULL(rank_level, 0) FROM Hunters WHERE hunter_id = @HunID;
-    SELECT @resistance = CAST(ISNULL(terror_index, 0) as FLOAT) * 5 
+    SELECT @resistance = CAST(ISNULL(terror_index, 0) as FLOAT) * 10 
     FROM Entities WHERE entity_id = @entity_id;
     
     -- Formula computation 
     IF @artifact_id IS NULL
     BEGIN
         SET @attackpower = 30.0; 
-        IF @hunterrank < 5 SET @resistance = @resistance * 1.5;
+        IF @hunterrank < 5 SET @resistance = @resistance * 2.5;
     END 
     ELSE 
     BEGIN
@@ -139,7 +139,7 @@ BEGIN
     -- REMOVED: SELECT @win_ratio AS Prob (This was creating recordsets[0])
 
     -- Decision logic
-    IF @win_ratio > 0.5
+    IF @win_ratio > 0.8
     BEGIN 
         UPDATE Artifacts SET status = 'Used' WHERE artifact_id = @artifact_id;
         UPDATE Hunters SET rank_level = rank_level + 1 WHERE hunter_id = @HunID;
@@ -154,7 +154,7 @@ BEGIN
     BEGIN
         -- 1. LOG THE OUTCOME FIRST
         INSERT INTO Operations (hunter_id, entity_id, location_id, artifact_id, operation_date, outcome)
-        VALUES (@HunID, @entity_id, @LocID, @artifact_id, GETDATE(), 'archived');
+        VALUES (NULL, @entity_id, @LocID, @artifact_id, GETDATE(), 'archived');
 
         -- 2. CLEAR THE GAME LOG (Fixes the Foreign Key conflict)
         -- We delete the log entry so nothing points to the hunter anymore
@@ -167,7 +167,7 @@ BEGIN
      END
 END
 
-
+SELECT * FROM "Operations"
 
 
 --- test

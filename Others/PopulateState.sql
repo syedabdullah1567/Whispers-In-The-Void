@@ -29,64 +29,82 @@ INSERT INTO Bloodlines (bloodline_name, origin_realm, dominant_trait, legacy_thr
 
 -- 3. ENTITIES (The High-Value Targets)
 INSERT INTO Entities (true_name, entity_species, terror_index, existence_state, current_lair_id, bloodline_id) VALUES 
--- Hub: Aether Lab 4 (Location 5) - The "5-and-5" synchronized zone
-('Xylo-Thul', 'Wraith', 10, 'unlocated', 5, 4),        -- Weakness: Dimensional Anchoring (Art 2)
-('Morana Prime', 'Wraith', 9, 'unlocated', 5, 4),       -- Weakness: Endothermic Shock (Art 5)
-('Glacia', 'Wraith', 6, 'unlocated', 5, 2),             -- Weakness: Soul Shredding (Art 14)
-('The Lab-Stalker', 'Wraith', 7, 'unlocated', 5, 4),    -- Weakness: Molecular Agitation (Art 15)
-('Alpha Poltergeist', 'Poltergeist', 8, 'unlocated', 5, 8), -- Weakness: Physical Manifestation (Art 4)
+-- Location 5 (Hub): 6 Entities
+('Xylo-Thul', 'Wraith', 10, 'unlocated', 5, 4),           -- Art 2
+('Morana Prime', 'Wraith', 9, 'unlocated', 5, 4),          -- Art 5
+('Glacia', 'Wraith', 6, 'unlocated', 5, 2),              -- Art 14
+('The Lab-Stalker', 'Wraith', 7, 'unlocated', 5, 4),       -- Art 15
+('Alpha Poltergeist', 'Poltergeist', 8, 'unlocated', 5, 8),-- Art 4
+('Wraith-Echo', 'Wraith', 4, 'unlocated', 5, 4),           -- Art 16
 
--- Other Synchronized Locations
-('Valerius the Cruel', 'Vampire', 8, 'unlocated', 1, 1), -- Weakness: Solar Exposure (Art 1)
-('Unit 734-Omega', 'Poltergeist', 9, 'unlocated', 2, 8), -- Weakness: EM Pulse (Art 6)
-('Sector 7 Deserter', 'Vampire', 5, 'unlocated', 2, 1),  -- Weakness: Heart Piercing (Art 3)
-('Whisper-in-Walls', 'Poltergeist', 3, 'unlocated', 3, 2), -- Weakness: Salt-Circle (Art 4)
-('Automaton Zeta', 'Poltergeist', 6, 'unlocated', 8, 8),   -- Weakness: Thermal Sight (Art 13)
-('Eldritch Eye', 'Poltergeist', 8, 'unlocated', 8, 4),    -- Weakness: Thermal Sight (Art 13)
-('Astro-Lich Kel''Thuz', 'Wraith', 10, 'unlocated', 9, 4), -- Weakness: Gravity Well (Art 11 - Moved)
-('Abyssal Leviathan', 'Wraith', 10, 'unlocated', 10, 6),  -- Weakness: Ethereal Siphon (Art 8)
-('Cthulian Scout', 'Vampire', 6, 'unlocated', 10, 6),    -- Weakness: Iron Binding (Art 7 - Moved)
-('Goliath Prime', 'Vampire', 9, 'unlocated', 12, 3),     -- Weakness: Iron Binding (Art 7)
-('Blood-Baron Vane', 'Vampire', 7, 'unlocated', 13, 1),   -- Weakness: Ancient Bone (Art 12)
-('Ignis the Scorched', 'Wraith', 7, 'unlocated', 15, 5); -- Weakness: Molecular Agitation (Art 15)
+-- Location 10 (Abyssal): 2 Entities
+('Abyssal Leviathan', 'Wraith', 10, 'unlocated', 10, 6),   -- Art 8
+('Cthulian Scout', 'Vampire', 6, 'unlocated', 10, 6),      -- Art 7
+
+-- Location 2 (Sector 7): 2 Entities
+('Unit 734-Omega', 'Poltergeist', 9, 'unlocated', 2, 8),   -- Art 6
+('Sector 7 Deserter', 'Vampire', 5, 'unlocated', 2, 1),    -- Art 3
+
+-- Location 8 (Neo-Tokyo): 2 Entities
+('Automaton Zeta', 'Poltergeist', 6, 'unlocated', 8, 8),   -- Art 13
+('Eldritch Eye', 'Poltergeist', 8, 'unlocated', 8, 4),      -- Art 13
+
+-- Single Occupancy Locations
+('Valerius the Cruel', 'Vampire', 8, 'unlocated', 1, 1),    -- Art 1 (Loc 1)
+('Whisper-in-Walls', 'Poltergeist', 3, 'unlocated', 3, 2),  -- Art 17 (Loc 3)
+('Astro-Lich Kel''Thuz', 'Wraith', 10, 'unlocated', 9, 4),  -- Art 11 (Loc 9)
+('Goliath Prime', 'Vampire', 9, 'unlocated', 12, 3),        -- Art 18 (Loc 12) - NEW
+('Blood-Baron Vane', 'Vampire', 7, 'unlocated', 13, 1),      -- Art 12 (Loc 13)
+('Ignis the Scorched', 'Wraith', 7, 'unlocated', 15, 5),    -- Art 19 (Loc 15) - NEW
+('Chernobyl Stalker', 'Wraith', 8, 'unlocated', 14, 4),     -- Art 9 (Loc 14) - NEW
+('The Blackwood Banshee', 'Poltergeist', 7, 'unlocated', 6, 7); -- Art 10 (Loc 6) - NEW
 
 -- 4. ARTIFACTS (The Arsenal)
 INSERT INTO Artifacts (artifact_name, artifact_type, origin, location_id, status) VALUES 
-('Sun-Forged Blade', 'Weapon', 'Solar Forge', 1, 'Active'),      -- Vampire Slasher
-('Void Anchor', 'Relic', 'The Far Realm', 5, 'Active'),          -- Wraith Anchor
-('Silver Stake', 'Tool', 'Vanguard Labs', 2, 'Active'),           -- Vampire Stake
-('Iron-Salt Urn', 'Utility', 'Old World', 5, 'Active'),           -- Poltergeist/Wraith Trap (Moved to Loc 5)
-('Cryo-Blaster MK IV', 'Weapon', 'Aether Labs', 5, 'Active'),     -- Wraith Freezer
-('EMP Grenade', 'Utility', 'Sector 7', 2, 'Active'),               -- Poltergeist Disrupter
-('Cold-Iron Shackles', 'Tool', 'The Crucible', 10, 'Active'),     -- Vampire Binder (Moved to Loc 10)
-('Abyssal Pearl', 'Relic', 'Ocean Floor', 10, 'Active'),          -- Wraith Siphon
-('Lead-Lined Amulet', 'Charm', 'Chernobyl', 14, 'Active'),         -- Wraith Shield
-('Banshee''s Gag', 'Tool', 'Blackwood', 6, 'Active'),             -- Poltergeist Mute
-('Null-Gravity Field', 'Utility', 'Orbital Station', 9, 'Active'), -- Wraith/Vampire (Moved to Loc 9)
-('Dragon-Bone Spear', 'Weapon', 'Hollow Earth', 13, 'Active'),    -- Vampire Regenerator Killer
-('True-Sight Goggles', 'Tool', 'Neo-Tokyo', 8, 'Active'),         -- Poltergeist Tracker
-('Phylactery Breaker', 'Weapon', 'Catacombs', 5, 'Active'),       -- Wraith Soul Shredder (Moved to Loc 5)
-('Thermal Lance', 'Weapon', 'Glass Desert', 5, 'Active');         -- Wraith Heat Lance (Moved to Loc 5)      
+('Sun-Forged Blade', 'Weapon', 'Solar Forge', 1, 'Active'),      -- Art 1
+('Void Anchor', 'Relic', 'The Far Realm', 5, 'Active'),          -- Art 2
+('Silver Stake', 'Tool', 'Vanguard Labs', 2, 'Active'),          -- Art 3
+('Iron-Salt Urn', 'Utility', 'Old World', 5, 'Active'),          -- Art 4
+('Cryo-Blaster MK IV', 'Weapon', 'Aether Labs', 5, 'Active'),    -- Art 5
+('EMP Grenade', 'Utility', 'Sector 7', 2, 'Active'),             -- Art 6
+('Cold-Iron Shackles', 'Tool', 'The Crucible', 10, 'Active'),    -- Art 7
+('Abyssal Pearl', 'Relic', 'Ocean Floor', 10, 'Active'),         -- Art 8
+('Lead-Lined Amulet', 'Charm', 'Chernobyl', 14, 'Active'),       -- Art 9
+('Banshee''s Gag', 'Tool', 'Blackwood', 6, 'Active'),            -- Art 10
+('Null-Gravity Field', 'Utility', 'Orbital Station', 9, 'Active'),-- Art 11
+('Dragon-Bone Spear', 'Weapon', 'Hollow Earth', 13, 'Active'),   -- Art 12
+('True-Sight Goggles', 'Tool', 'Neo-Tokyo', 8, 'Active'),        -- Art 13
+('Phylactery Breaker', 'Weapon', 'Catacombs', 5, 'Active'),      -- Art 14
+('Thermal Lance', 'Weapon', 'Glass Desert', 5, 'Active'),        -- Art 15
+('Spirit Magnet', 'Utility', 'Void Rim', 5, 'Active'),           -- Art 16
+('Consecrated Salt', 'Utility', 'Vatican', 3, 'Active'),         -- Art 17
+('Heavy Gravity Maul', 'Weapon', 'Deep Core', 12, 'Active'),     -- Art 18 - NEW (Loc 12)
+('Solar Flare Rig', 'Weapon', 'Glass Desert', 15, 'Active'),     -- Art 19 - NEW (Loc 15)
+('Ecto-Containment Unit', 'Tool', 'Aegis HQ', 6, 'Active');       -- Art 20 - NEW (Loc 6)
 
 
 -- 5. WEAKNESSES (The Tactical Data)
 INSERT INTO Weaknesses (weakness_name, description, entity_type, artifact_id) VALUES 
 ('Solar Exposure', 'Sun-Forged energy incinerates undead flesh.', 'Vampire', 1),
-('Dimensional Anchoring', 'Stabilizes the shifting form of high-tier spirits.', 'Wraith', 2),
+('Dimensional Anchoring', 'Stabilizes shifting forms.', 'Wraith', 2),
 ('Heart Piercing', 'Standard silver penetration protocol.', 'Vampire', 3),
-('Physical Manifestation', 'Forces spectral entities into a tangible state.', 'Wraith', 4),
 ('Salt-Circle Entrapment', 'Blocks poltergeist movement.', 'Poltergeist', 4),
-('Endothermic Shock', 'Freezes the ectoplasmic mist of a Wraith.', 'Wraith', 5),
-('EM Pulse', 'Disrupts the electrical possession of Poltergeists.', 'Poltergeist', 6),
-('Iron Binding', 'Cold iron burns the skin of ancient Vampires.', 'Vampire', 7),
-('Ethereal Siphon', 'Drains the energy from aquatic Wraiths.', 'Wraith', 8),
-('Lead Shielding', 'Blocks the radioactive aura of corrupted Wraiths.', 'Wraith', 9),
-('Acoustic Dampening', 'Mutes the kinetic energy of a Poltergeist.', 'Poltergeist', 10),
-('Gravity Well', 'Crushes the dense physical form of a Vampire Lord.', 'Vampire', 11),
-('Ancient Bone Piercing', 'Bypasses the regenerative blood-shield of Vampires.', 'Vampire', 12),
-('Thermal Sight', 'Tracks the heat-signature of a cloaked Poltergeist.', 'Poltergeist', 13),
-('Soul Shredding', 'Directly damages the essence of a Wraith.', 'Wraith', 14),
-('Molecular Agitation', 'Heat-based weapon effective against ice-aligned Wraiths.', 'Wraith', 15);
+('Endothermic Shock', 'Freezes ectoplasmic mist.', 'Wraith', 5),
+('EM Pulse', 'Disrupts electrical possession.', 'Poltergeist', 6),
+('Iron Binding', 'Cold iron burns ancient Vampire skin.', 'Vampire', 7),
+('Ethereal Siphon', 'Drains energy from aquatic Wraiths.', 'Wraith', 8),
+('Lead Shielding', 'Blocks radioactive aura.', 'Wraith', 9),
+('Acoustic Dampening', 'Mutes kinetic energy.', 'Poltergeist', 10),
+('Gravity Well', 'Crushes dense physical forms.', 'Wraith', 11),
+('Ancient Bone Piercing', 'Bypasses regenerative shields.', 'Vampire', 12),
+('Thermal Sight', 'Tracks heat-signatures of cloaked entities.', 'Poltergeist', 13),
+('Soul Shredding', 'Damages the essence of a Wraith.', 'Wraith', 14),
+('Molecular Agitation', 'Effective against ice-aligned Wraiths.', 'Wraith', 15),
+('Magnetic Trapping', 'Prevents Wraith dispersion.', 'Wraith', 16),
+('Consecrated Barrier', 'Repels poltergeists from salt-rich zones.', 'Poltergeist', 17),
+('Crushing Force', 'Physical weight overwhelms high durability.', 'Vampire', 18),
+('Intense Incineration', 'Concentrated heat burns through ice-wraiths.', 'Wraith', 19),
+('Ecto-Extraction', 'Vacuums spiritual energy into a core.', 'Poltergeist', 20);
 
 
 -- 6. HUNTERS (The Operatives)

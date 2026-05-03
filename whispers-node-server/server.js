@@ -444,3 +444,19 @@ app.post('/api/weaknesses/decrypt', async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 })
+
+app.get('/api/weaknesses/decrypted', async (req, res) => {
+  try {
+    const pool = await poolPromise
+    const result = await pool.request()
+      .query(`
+        SELECT W.*, A.artifact_name, A.status AS artifact_status
+        FROM Weaknesses W
+        LEFT JOIN Artifacts A ON W.artifact_id = A.artifact_id
+        WHERE W.is_decrypted = 1
+      `)
+    res.json(result.recordset)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
