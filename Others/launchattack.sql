@@ -146,7 +146,7 @@ BEGIN
 
         select 'FAILURE' as Result,
         ROUND(@win_ratio, 3) as Win_Probability,
-        'Hunter is now a monster as you failed to safe him - Status: In Resurrection' as message;
+        'Hunter has been eliminated' as message;
      END
 END
 
