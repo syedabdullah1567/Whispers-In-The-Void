@@ -6,7 +6,7 @@ add artifact_power int
 select * from Artifacts
 ------------------------------------------------------------------------
 --artifact changes 
-GO
+
 CREATE OR ALTER PROCEDURE Get_Artifacts_At_Location_GamsPlay
     @SessionID INT
 AS
@@ -149,6 +149,12 @@ BEGIN
         'Hunter has been eliminated' as message;
      END
 END
+
+
+
+
+
+
 
 
 

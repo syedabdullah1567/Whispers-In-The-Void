@@ -7,9 +7,6 @@ DROP TABLE IF EXISTS Hunters;
 DROP TABLE IF EXISTS Entities;
 DROP TABLE IF EXISTS Locations;
 DROP TABLE IF EXISTS Bloodlines;
-DROP TABLE IF EXISTS Penalties;
-DROP TABLE IF EXISTS PenaltyTypes;
-DROP TABLE IF EXISTS Decryption_Attempts;
 
 CREATE TABLE Bloodlines (
     bloodline_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -33,7 +30,7 @@ CREATE TABLE Entities (
     entity_species VARCHAR(50) NOT NULL,
     terror_index INT CHECK (terror_index BETWEEN 1 AND 10),
     existence_state VARCHAR(20) NOT NULL
-        CHECK (existence_state IN ('active', 'neutralized', 'archived')),
+        CHECK (existence_state IN ('active', 'neutralized', 'unlocated')),
     current_lair_id INT,
     bloodline_id INT,
     FOREIGN KEY (current_lair_id)
@@ -50,6 +47,7 @@ CREATE TABLE Hunters (
     rank VARCHAR(50) NOT NULL,
     type VARCHAR(20) NOT NULL,
     faction VARCHAR(100),
+    
     CONSTRAINT CHK_HunterType CHECK (type IN ('Scout', 'Collector', 'Attacker'))
 );
 
@@ -72,6 +70,7 @@ CREATE TABLE Weaknesses (
     description VARCHAR(MAX),
     entity_type VARCHAR(50) NOT NULL,
     artifact_id INT,
+    is_decrypted INT,
     FOREIGN KEY (artifact_id)
         REFERENCES Artifacts(artifact_id)
         ON DELETE SET NULL
@@ -103,45 +102,3 @@ CREATE TABLE Operations (
         REFERENCES Weaknesses(weakness_id)
         ON DELETE CASCADE
 );
-
-
-CREATE TABLE Decryption_Attempts (
-    attempt_id    INT IDENTITY(1,1) PRIMARY KEY,
-    hunter_id     INT NOT NULL,
-    attempts_used INT DEFAULT 0,
-    current_shift INT,
-    last_attempt  DATETIME,
-    locked_until  DATETIME,
-    encrypted_text VARCHAR(200),
-    entity_species VARCHAR(50),
-    FOREIGN KEY (hunter_id) REFERENCES Hunters(hunter_id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE Penalties (
-    penalty_id          INT IDENTITY(1,1) PRIMARY KEY,
-    hunter_id           INT NOT NULL,
-    penalty_type        VARCHAR(50) NOT NULL,
-    penalty_description VARCHAR(MAX),
-    affected_id         INT,
-    penalty_date        DATETIME DEFAULT GETDATE(),
-    CONSTRAINT CHK_PenaltyType CHECK (penalty_type IN (
-        'ArtifactLost',
-        'EntitySpawned',
-        'EntityResurrected'
-    )),
-    FOREIGN KEY (hunter_id) REFERENCES Hunters(hunter_id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE PenaltyTypes (
-    penalty_type_id INT IDENTITY(1,1) PRIMARY KEY,
-    penalty_type    VARCHAR(50) NOT NULL,
-    description     VARCHAR(MAX)
-);
-
-
-
-
-
-

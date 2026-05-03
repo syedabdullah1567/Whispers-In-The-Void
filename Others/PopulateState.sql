@@ -29,31 +29,31 @@ INSERT INTO Bloodlines (bloodline_name, origin_realm, dominant_trait, legacy_thr
 
 -- 3. ENTITIES (The High-Value Targets)
 INSERT INTO Entities (true_name, entity_species, terror_index, existence_state, current_lair_id, bloodline_id) VALUES 
-('Xylo-Thul', 'Void Horror', 10, 'unlocated', 1, 4),
-('Morana Prime', 'Lich', 9, 'unlocated', 4, 4),
+('Xylo-Thul', 'Wraith', 10, 'unlocated', 1, 4),
+('Morana Prime', 'Wraith', 9, 'unlocated', 4, 4),
 ('Valerius the Cruel', 'Vampire', 8, 'unlocated', 1, 1),
 ('Glacia', 'Wraith', 6, 'unlocated', 3, 2),
-('Korg the Breaker', 'Ogre', 5, 'unlocated', 3, 3),
-('Morana Echo', 'Lich', 5, 'unlocated', 4, 4),
+('Korg the Breaker', 'Vampire', 5, 'unlocated', 3, 3),
+('Morana Echo', 'Wraith', 5, 'unlocated', 4, 4),
 ('Whisper-in-Walls', 'Poltergeist', 3, 'unlocated', 2, 2),
-('Ignis the Scorched', 'Fire Elemental', 7, 'unlocated', 15, 5),
-('Cthulian Scout', 'Deep One', 6, 'unlocated', 10, 6),
-('Titania''s Shadow', 'Dark Fae', 8, 'unlocated', 3, 7),
-('Unit 734-Omega', 'Cyber-Demon', 9, 'unlocated', 8, 8),
-('The Weeping Lady', 'Banshee', 7, 'unlocated', 6, 2),
-('Goliath Prime', 'Behemoth', 9, 'unlocated', 12, 3),
-('Silas the Flayer', 'Vampire Lord', 9, 'unlocated', 6, 1),
-('Abyssal Leviathan', 'Sea Terror', 10, 'unlocated', 10, 6),
-('Chernobog Aspect', 'Radiation Demon', 9, 'unlocated', 14, 4),
-('The Skinwalker', 'Shapeshifter', 6, 'unlocated', 11, 7),
-('Astro-Lich Kel''Thuz', 'Space Lich', 10, 'unlocated', 9, 4),
-('Yeti King', 'Frost Giant', 7, 'unlocated', 7, 2),
-('Automaton Zeta', 'Rogue AI', 6, 'unlocated', 5, 8),
+('Ignis the Scorched', 'Wraith', 7, 'unlocated', 15, 5),
+('Cthulian Scout', 'Vampire', 6, 'unlocated', 10, 6),
+('Titania''s Shadow', 'Wraith', 8, 'unlocated', 3, 7),
+('Unit 734-Omega', 'Poltergeist', 9, 'unlocated', 8, 8),
+('The Weeping Lady', 'Wraith', 7, 'unlocated', 6, 2),
+('Goliath Prime', 'Vampire', 9, 'unlocated', 12, 3),
+('Silas the Flayer', 'Vampire', 9, 'unlocated', 6, 1),
+('Abyssal Leviathan', 'Wraith', 10, 'unlocated', 10, 6),
+('Chernobog Aspect', 'Wraith', 9, 'unlocated', 14, 4),
+('The Skinwalker', 'Vampire', 6, 'unlocated', 11, 7),
+('Astro-Lich Kel''Thuz', 'Wraith', 10, 'unlocated', 9, 4),
+('Yeti King', 'Wraith', 7, 'unlocated', 7, 2),
+('Automaton Zeta', 'Poltergeist', 6, 'unlocated', 5, 8),
 ('Blood-Baron Vane', 'Vampire', 7, 'unlocated', 13, 1),
-('Magma Wyrm', 'Dragon', 9, 'unlocated', 12, 5),
-('Void-Spawn Alpha', 'Void Horror', 8, 'unlocated', 9, 4),
-('The Rat King', 'Mutant Swarm', 5, 'unlocated', 8, 6),
-('Eldritch Eye', 'Watcher', 8, 'unlocated', 13, 4);
+('Magma Wyrm', 'Vampire', 9, 'unlocated', 12, 5),
+('Void-Spawn Alpha', 'Wraith', 8, 'unlocated', 9, 4),
+('The Rat King', 'Poltergeist', 5, 'unlocated', 8, 6),
+('Eldritch Eye', 'Poltergeist', 8, 'unlocated', 13, 4);
 
 
 -- 4. ARTIFACTS (The Arsenal)
@@ -78,22 +78,21 @@ INSERT INTO Artifacts (artifact_name, artifact_type, origin, location_id, status
 -- 5. WEAKNESSES (The Tactical Data)
 INSERT INTO Weaknesses (weakness_name, description, entity_type, artifact_id) VALUES 
 ('Solar Exposure', 'Sun-Forged energy incinerates undead flesh.', 'Vampire', 1),
-('Dimensional Anchoring', 'Stabilizes reality to weaken void entities.', 'Void Horror', 2),
+('Dimensional Anchoring', 'Stabilizes the shifting form of high-tier spirits.', 'Wraith', 2),
 ('Heart Piercing', 'Standard silver penetration protocol.', 'Vampire', 3),
 ('Physical Manifestation', 'Forces spectral entities into a tangible state.', 'Wraith', 4),
 ('Salt-Circle Entrapment', 'Blocks poltergeist movement.', 'Poltergeist', 4),
-('Endothermic Shock', 'Rapid freezing shatters elemental cores.', 'Fire Elemental', 5),
-('Circuit Fry', 'Overloads neural and mechanical pathways.', 'Cyber-Demon', 6),
-('Circuit Fry', 'Overloads artificial intelligence matrices.', 'Rogue AI', 6),
-('Fae-Bane', 'Cold iron burns and binds twilight beings.', 'Dark Fae', 7),
-('Dehydration Ward', 'Siphons moisture from aquatic mutants.', 'Deep One', 8),
-('Radiation Dampening', 'Strips the demon of its irradiated aura.', 'Radiation Demon', 9),
-('Sonic Nullification', 'Silences the deadly scream of the spirit.', 'Banshee', 10),
-('Mass Displacement', 'Renders heavy targets immobile and helpless.', 'Behemoth', 11),
-('Scale Puncture', 'The only material hard enough to pierce dragon scales.', 'Dragon', 12),
-('Form Lock', 'Forces shapeshifters back into their true, vulnerable form.', 'Shapeshifter', 13),
-('Soul Severance', 'Shatters the arcane link to their phylactery.', 'Lich', 14),
-('Core Melt', 'Melts through glacial armor instantly.', 'Frost Giant', 15);
+('Endothermic Shock', 'Freezes the ectoplasmic mist of a Wraith.', 'Wraith', 5),
+('EM Pulse', 'Disrupts the electrical possession of Poltergeists.', 'Poltergeist', 6),
+('Iron Binding', 'Cold iron burns the skin of ancient Vampires.', 'Vampire', 7),
+('Ethereal Siphon', 'Drains the energy from aquatic Wraiths.', 'Wraith', 8),
+('Lead Shielding', 'Blocks the radioactive aura of corrupted Wraiths.', 'Wraith', 9),
+('Acoustic Dampening', 'Mutes the kinetic energy of a Poltergeist.', 'Poltergeist', 10),
+('Gravity Well', 'Crushes the dense physical form of a Vampire Lord.', 'Vampire', 11),
+('Ancient Bone Piercing', 'Bypasses the regenerative blood-shield of Vampires.', 'Vampire', 12),
+('Thermal Sight', 'Tracks the heat-signature of a cloaked Poltergeist.', 'Poltergeist', 13),
+('Soul Shredding', 'Directly damages the essence of a Wraith.', 'Wraith', 14),
+('Molecular Agitation', 'Heat-based weapon effective against ice-aligned Wraiths.', 'Wraith', 15);
 
 
 -- 6. HUNTERS (The Operatives)

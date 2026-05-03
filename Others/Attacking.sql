@@ -1,5 +1,5 @@
 ------------------------------
-drop table ATTACKER_GAME_LOG
+drop table if exists ATTACKER_GAME_LOG
 drop procedure sp_starting_attack
 drop procedure sp_addingentity_for_attack
 drop procedure Get_Artifacts_At_Location_GamsPlay

@@ -45,7 +45,7 @@ const AudioController = ({ horrorRef, dashboardRef, gameStarted }) => {
             "/weaknesses/species",
             "/weaknesses/cipher/Poltergeist",
             "/weaknesses/cipher/Vampire",
-            "/weaknesses/cipher/Poltergeist"
+            "/weaknesses/cipher/Wraith"
         ];
         
         const isDashboardPath = dashboardPaths.includes(location.pathname);
@@ -92,7 +92,7 @@ export default function App() {
         <BrowserRouter>
             <div className="App">
                 {/* GLOBAL AUDIO SOURCES */}
-               /* <audio ref={horrorRef} src="/assets/audio/castlevania.mp3" loop /> */
+                <audio ref={horrorRef} src="/assets/audio/castlevania.mp3" loop />
                 <audio ref={dashboardRef} src="/assets/audio/nightmare.mp3" loop />
                 
                 {/* The brain that decides which music plays */}
