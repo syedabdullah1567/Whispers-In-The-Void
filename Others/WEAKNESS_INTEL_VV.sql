@@ -1,6 +1,65 @@
 
+USE [Whispers-in-the-void]
 
---- WEAKNESSS TABBBBBBBB -----------
+DROP TABLE IF EXISTS PenaltyTypes;
+DROP TABLE IF EXISTS Penalties;
+DROP TABLE IF EXISTS Decryption_Attempts;
+DROP TABLE IF EXISTS Weaknesses;
+
+
+
+CREATE TABLE Weaknesses (
+    weakness_id INT IDENTITY(1,1) PRIMARY KEY,
+    weakness_name VARCHAR(100) NOT NULL,
+    description VARCHAR(MAX),
+    entity_type VARCHAR(50) NOT NULL,
+    artifact_id INT,
+    is_decrypted BIT DEFAULT 0,
+    FOREIGN KEY (artifact_id)
+        REFERENCES Artifacts(artifact_id)
+        ON DELETE SET NULL
+);
+
+
+CREATE TABLE Decryption_Attempts (
+    attempt_id    INT IDENTITY(1,1) PRIMARY KEY,
+    hunter_id     INT NOT NULL,
+    attempts_used INT DEFAULT 0,
+    current_shift INT,
+    last_attempt  DATETIME,
+    locked_until  DATETIME,
+    encrypted_text VARCHAR(200),
+    entity_species VARCHAR(50),
+    FOREIGN KEY (hunter_id) REFERENCES Hunters(hunter_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Penalties (
+    penalty_id          INT IDENTITY(1,1) PRIMARY KEY,
+    hunter_id           INT NOT NULL,
+    penalty_type        VARCHAR(50) NOT NULL,
+    penalty_description VARCHAR(MAX),
+    affected_id         INT,
+    penalty_date        DATETIME DEFAULT GETDATE(),
+    CONSTRAINT CHK_PenaltyType CHECK (penalty_type IN (
+        'ArtifactLost',
+        'EntitySpawned',
+        'EntityResurrected'
+    )),
+    FOREIGN KEY (hunter_id) REFERENCES Hunters(hunter_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE PenaltyTypes (
+    penalty_type_id INT IDENTITY(1,1) PRIMARY KEY,
+    penalty_type    VARCHAR(50) NOT NULL,
+    description     VARCHAR(MAX)
+);
+
+
+
+
+------------------------ WEAKNESSS TABBBBBBBB -----------
 
 
 CREATE OR ALTER PROCEDURE sp_FireRandomPenalty
@@ -18,6 +77,8 @@ BEGIN
 END
 
 
+
+----------- Penalty Type 1 Artifact Reset
 
 CREATE OR ALTER PROCEDURE sp_PenaltyLoseArtifact
     @hunter_id INT
@@ -70,7 +131,7 @@ SELECT * FROM Penalties
 
 
 
--- Penalty Type 2 Spawn Entity
+----------- Penalty Type 2 Spawn Entity
 
 CREATE OR ALTER PROCEDURE sp_PenaltySpawnEntity
     @hunter_id INT
@@ -153,7 +214,7 @@ SELECT * FROM Penalties
 
 
 
--- Penalty Type 3 Entity Resurruction
+---------- Penalty Type 3 Entity Resurruction
 CREATE OR ALTER PROCEDURE sp_PenaltyResurrectEntity
     @hunter_id INT
 AS
@@ -196,7 +257,7 @@ BEGIN
 
     COMMIT
 
-    SELECT 'SYSTEM CORRUPTED — ' + E.true_name + ' RESURRECTED // Artifact destroyed' AS message
+    SELECT 'SYSTEM CORRUPTED â€” ' + E.true_name + ' RESURRECTED // Artifact destroyed' AS message
     FROM Entities E WHERE E.entity_id = @entity_id
 END
 
@@ -209,10 +270,10 @@ SELECT * FROM Penalties
 
 
 
--------------- Encryption System -----------
+---------------------------- Encryption System -----------
 
-
-
+-- Genration of ENcryption of Weakness name of the selected entity (based on entity_specie of the selected Entity 
+DROP PROCEDURE sp_GenerateShift
 CREATE OR ALTER PROCEDURE sp_GenerateShift
     @Entity_species VARCHAR(50) = '',
     @hunter_id INT
@@ -226,7 +287,7 @@ BEGIN
 
     IF @locked_until IS NOT NULL AND @locked_until > GETDATE()
     BEGIN
-        SELECT 'LOCKED — Try again after: ' + CAST(@locked_until AS VARCHAR) AS message
+        SELECT 'LOCKED â€” Try again after: ' + CAST(@locked_until AS VARCHAR) AS message
         RETURN
     END
 
@@ -252,36 +313,31 @@ BEGIN
     END
 
     DECLARE @i INT = 1 
-    DECLARE @curr_Letter CHAR 
-    DECLARE @new_Letter CHAR 
+    DECLARE @curr_Letter VARCHAR(1)
     DECLARE @ascii INT
-    DECLARE @New_ascii INT
+    DECLARE @new_ascii INT
 
-    while @i<=LEN(@Weakness_name)
+    WHILE @i <= LEN(@Weakness_name)
     BEGIN
-        SET @curr_Letter = SUBSTRING(@Weakness_name, @i, 1);
-
+        SET @curr_Letter = SUBSTRING(@Weakness_name, @i, 1)
         SET @ascii = ASCII(@curr_Letter)
 
-        IF @curr_Letter BETWEEN 'a' AND 'z'
+        IF @ascii BETWEEN 65 AND 90  -- A-Z
         BEGIN
-            SET @new_ascii = ((@ascii - 97 + @Shift) % 26) + 97;
-            SET @EncryptedText = @EncryptedText + CHAR(@new_ascii);
+            SET @new_ascii = ((@ascii - 65 + @Shift) % 26) + 65
+            SET @EncryptedText = @EncryptedText + CHAR(@new_ascii)
         END
-        -- Shift only uppercase letters
-        ELSE IF @curr_Letter BETWEEN 'A' AND 'Z'
+        ELSE IF @ascii BETWEEN 97 AND 122  -- a-z
         BEGIN
-            SET @new_ascii = ((@ascii - 65 + @Shift) % 26) + 65;
-            SET @EncryptedText = @EncryptedText + CHAR(@new_ascii);
+            SET @new_ascii = ((@ascii - 97 + @Shift) % 26) + 97
+            SET @EncryptedText = @EncryptedText + CHAR(@new_ascii)
         END
-        -- Keep spaces & symbols unchanged
-        ELSE
+        ELSE  -- space or anything else
         BEGIN
-            SET @EncryptedText = @EncryptedText + @curr_Letter;
+            SET @EncryptedText = @EncryptedText
         END
 
-        SET @i = @i + 1;
-
+        SET @i = @i + 1
     END
 
     BEGIN TRANSACTION
@@ -294,83 +350,124 @@ BEGIN
     SELECT 
     @EncryptedText AS encrypted_text,
     @Shift         AS shift_hint,
-    'Cipher generated — crack the code' AS message
+    'Cipher generated â€” crack the code' AS message
 
 
 END
 
-
-CREATE OR ALTER PROCEDURE sp_CheckDecryption 
-
+-- Checking of decryption
+CREATE OR ALTER PROCEDURE sp_CheckDecryption
     @hunter_id INT,
-    @Shift INT,
+    @UserGuess VARCHAR(50),
     @Entity_species VARCHAR(50) = ''
-
-AS 
+AS
 BEGIN
-    DECLARE @locked_until DATETIME
-    SELECT @locked_until = locked_until 
-    FROM Decryption_Attempts 
-    WHERE hunter_id = @hunter_id
+
+    DECLARE @locked_until DATETIME;
+
+    SELECT @locked_until = locked_until
+    FROM Decryption_Attempts
+    WHERE hunter_id = @hunter_id;
 
     IF @locked_until IS NOT NULL AND @locked_until > GETDATE()
     BEGIN
-        SELECT 'LOCKED!! Try again after: ' + CAST(@locked_until AS VARCHAR) AS message
-        RETURN
+        SELECT 'LOCKED!! Try again after: ' + CAST(@locked_until AS VARCHAR) AS message;
+        RETURN;
     END
 
-    DECLARE @attempts INT
-    DECLARE @current_shift INT
 
-    Select @attempts = attempts_used , @current_shift = current_shift
-    From Decryption_Attempts
-    Where @hunter_id = hunter_id
+    DECLARE @attempts INT;
+    DECLARE @current_shift INT;
+    DECLARE @stored_encrypted VARCHAR(50);
 
-    IF @Shift = @current_shift
+    SELECT 
+        @attempts = attempts_used,
+        @current_shift = current_shift,
+        @stored_encrypted = encrypted_text
+    FROM Decryption_Attempts
+    WHERE hunter_id = @hunter_id;
+
+    IF @current_shift IS NULL OR @stored_encrypted IS NULL
     BEGIN
+        SELECT 'No active cipher to decrypt.' AS message;
+        RETURN;
+    END
 
+
+    DECLARE 
+        @i INT = 1,
+        @curr CHAR(1),
+        @ascii INT,
+        @new_ascii INT,
+        @ReEncrypted VARCHAR(50) = '';
+
+    WHILE @i <= LEN(@UserGuess)
+    BEGIN
+        SET @curr = SUBSTRING(@UserGuess, @i, 1);
+        SET @ascii = ASCII(@curr);
+
+        IF @ascii BETWEEN 65 AND 90       -- A-Z
+            SET @new_ascii = ((@ascii - 65 + @current_shift) % 26) + 65;
+        ELSE IF @ascii BETWEEN 97 AND 122 -- a-z
+            SET @new_ascii = ((@ascii - 97 + @current_shift) % 26) + 97;
+        ELSE
+            SET @new_ascii = @ascii;
+
+        SET @ReEncrypted += CHAR(@new_ascii);
+        SET @i += 1;
+    END
+
+
+    IF @ReEncrypted = @stored_encrypted
+    BEGIN
         UPDATE Weaknesses
         SET is_decrypted = 1
-        WHERE entity_type = @Entity_species
+        WHERE entity_type = @Entity_species;
 
         UPDATE Decryption_Attempts
-        SET attempts_used = 0, current_shift = NULL, encrypted_text = NULL
-        WHERE hunter_id = @hunter_id
+        SET attempts_used = 0,
+            current_shift = NULL,
+            encrypted_text = NULL,
+            locked_until = NULL
+        WHERE hunter_id = @hunter_id;
 
-        SELECT 'DECRYPTION SUCCESSFUL!! Weakness unlocked' AS message
-        RETURN
+        SELECT 'DECRYPTION SUCCESSFUL!! Weakness unlocked' AS message;
+        RETURN;
     END
 
 
     UPDATE Decryption_Attempts
-    SET attempts_used = attempts_used + 1, last_attempt  = GETDATE()
-    WHERE hunter_id = @hunter_id
+    SET attempts_used = attempts_used + 1,
+        last_attempt = GETDATE()
+    WHERE hunter_id = @hunter_id;
 
-    SET @attempts = @attempts + 1
+    SET @attempts = @attempts + 1;
 
 
     IF @attempts >= 3
     BEGIN
         UPDATE Decryption_Attempts
-        SET locked_until  = DATEADD(DAY, 1, GETDATE()), attempts_used = 0
-        WHERE hunter_id = @hunter_id
+        SET locked_until = DATEADD(DAY, 1, GETDATE()),
+            attempts_used = 0
+        WHERE hunter_id = @hunter_id;
 
-        EXEC sp_FireRandomPenalty @hunter_id
+        EXEC sp_FireRandomPenalty @hunter_id;
 
-        SELECT 'SECURITY BREACH!! Penalty fired. Locked for 24 hours' AS message
-        RETURN
+        SELECT 'SECURITY BREACH!! Penalty fired. Locked for 24 hours' AS message;
+        RETURN;
     END
 
-    SELECT 'Wrong code!! Attempts remaining: ' + CAST(3 - @attempts AS VARCHAR) AS message
+    SELECT 'Wrong code!! Attempts remaining: ' 
+           + CAST(3 - @attempts AS VARCHAR) AS message;
 END
-
+GO
 
 
 -- generate cipher for Vampire weakness for hunter 1
-EXEC sp_GenerateShift @Entity_species = 'Vampire', @hunter_id = 1
+EXEC sp_GenerateShift @Entity_species = 'Vampire', @hunter_id = 2
 
 -- try wrong answer
-EXEC sp_CheckDecryption @hunter_id = 1, @Shift = 10, @Entity_species = 'Vampire'
+EXEC sp_CheckDecryption @hunter_id = 1, @Shift = 5, @Entity_species = 'Vampire'
 
 -- try correct shift (use whatever shift was generated)
 EXEC sp_CheckDecryption @hunter_id = 1, @Shift = 4, @Entity_species = 'Vampire'
@@ -378,6 +475,5 @@ EXEC sp_CheckDecryption @hunter_id = 1, @Shift = 4, @Entity_species = 'Vampire'
 -- verify
 SELECT * FROM Decryption_Attempts
 SELECT * FROM Weaknesses
-
 
 
