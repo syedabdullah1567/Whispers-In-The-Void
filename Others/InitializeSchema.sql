@@ -1,4 +1,8 @@
-EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT ALL";
+drop table if exists ATTACKER_GAME_LOG
+
+DROP TABLE IF EXISTS PenaltyTypes;
+DROP TABLE IF EXISTS Penalties;
+DROP TABLE IF EXISTS Decryption_Attempts;
 
 DROP TABLE IF EXISTS Operations;
 DROP TABLE IF EXISTS Weaknesses;
@@ -47,6 +51,7 @@ CREATE TABLE Hunters (
     rank VARCHAR(50) NOT NULL,
     type VARCHAR(20) NOT NULL,
     faction VARCHAR(100),
+    rank_level INT DEFAULT 1,
     
     CONSTRAINT CHK_HunterType CHECK (type IN ('Scout', 'Collector', 'Attacker'))
 );
@@ -57,6 +62,7 @@ CREATE TABLE Artifacts (
     artifact_type VARCHAR(50),
     origin VARCHAR(100),
     location_id INT,
+    artifact_power INT default 100,
     status VARCHAR(20) NOT NULL DEFAULT 'Unlocated',
     CONSTRAINT CHK_ArtifactState CHECK (status IN ('Unlocated', 'Discovered', 'Active', 'Used')),
     FOREIGN KEY (location_id)
@@ -85,7 +91,7 @@ CREATE TABLE Operations (
     weakness_id INT,
     operation_date DATE NOT NULL,
     outcome VARCHAR(20) NOT NULL
-        CHECK (outcome IN ('Scouting', 'Collection', 'Attacking')),
+        CHECK (outcome IN ('Scouting', 'Collection', 'Attacking', 'archived', 'neutralized')),
     FOREIGN KEY (hunter_id)
         REFERENCES Hunters(hunter_id)
         ON DELETE CASCADE,
@@ -102,3 +108,56 @@ CREATE TABLE Operations (
         REFERENCES Weaknesses(weakness_id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE Decryption_Attempts (
+    attempt_id    INT IDENTITY(1,1) PRIMARY KEY,
+    hunter_id     INT NOT NULL,
+    attempts_used INT DEFAULT 0,
+    current_shift INT,
+    last_attempt  DATETIME,
+    locked_until  DATETIME,
+    encrypted_text VARCHAR(200),
+    entity_species VARCHAR(50),
+    FOREIGN KEY (hunter_id) REFERENCES Hunters(hunter_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Penalties (
+    penalty_id          INT IDENTITY(1,1) PRIMARY KEY,
+    hunter_id           INT NOT NULL,
+    penalty_type        VARCHAR(50) NOT NULL,
+    penalty_description VARCHAR(MAX),
+    affected_id         INT,
+    penalty_date        DATETIME DEFAULT GETDATE(),
+    CONSTRAINT CHK_PenaltyType CHECK (penalty_type IN (
+        'ArtifactLost',
+        'EntitySpawned',
+        'EntityResurrected'
+    )),
+    FOREIGN KEY (hunter_id) REFERENCES Hunters(hunter_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE PenaltyTypes (
+    penalty_type_id INT IDENTITY(1,1) PRIMARY KEY,
+    penalty_type    VARCHAR(50) NOT NULL,
+    description     VARCHAR(MAX)
+);
+
+CREATE TABLE ATTACKER_GAME_LOG (
+session_id int identity(1,1) primary key,
+entity_id int,
+hunter_id int,
+location_id int,
+artifact_id int, 
+riddle_solved bit default 1,
+is_active int default 0,
+Foreign Key (hunter_id)
+references Hunters(hunter_id),
+Foreign Key (entity_id)
+references Entities(entity_id),
+Foreign Key (artifact_id)
+references Artifacts (artifact_id),
+Foreign Key (location_id)
+references Locations (location_id)
+)

@@ -75,16 +75,18 @@ const Authorize = () => {
                 toast.info("COMBAT AUTHENTICATED: INITIALIZING BATTLE LOG...");
 
                 try {
-                    // This hits the API that runs [sp_starting_attack]
-                    const sessionRes = await axios.post('http://localhost:3000/api/combat/start', { 
+                    // FIX: Changed URL from /api/combat/start to /api/combat/start-session
+                    // Note: Ensure hunter.hunter_id and location.location_id match what server.js expects
+                    const sessionRes = await axios.post('http://localhost:3000/api/combat/start-session', { 
                         hunterId: hunter.hunter_id,
-                        locationId: location.location_id,
-                        entityId: null // Or however you are selecting your target entity
+                        locationId: location.location_id
                     });
-                    
-                    // Store the session ID in your finalData so the 'Proceed' button can use it
+
+                    // This will now successfully receive the ID from the server
                     finalData.combatSessionId = sessionRes.data.sessionId;
                     finalData.message += " // COMBAT_SESSION_ACTIVE";
+                    
+                    console.log("Combat Session Initialized ID:", finalData.combatSessionId);
                 } catch (combatErr) {
                     console.error("Combat Session Initialization Failed:", combatErr);
                     finalData.message += " // SESSION_INIT_FAILURE";

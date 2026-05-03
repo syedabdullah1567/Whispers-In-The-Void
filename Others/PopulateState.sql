@@ -29,50 +29,44 @@ INSERT INTO Bloodlines (bloodline_name, origin_realm, dominant_trait, legacy_thr
 
 -- 3. ENTITIES (The High-Value Targets)
 INSERT INTO Entities (true_name, entity_species, terror_index, existence_state, current_lair_id, bloodline_id) VALUES 
-('Xylo-Thul', 'Wraith', 10, 'unlocated', 1, 4),
-('Morana Prime', 'Wraith', 9, 'unlocated', 4, 4),
-('Valerius the Cruel', 'Vampire', 8, 'unlocated', 1, 1),
-('Glacia', 'Wraith', 6, 'unlocated', 3, 2),
-('Korg the Breaker', 'Vampire', 5, 'unlocated', 3, 3),
-('Morana Echo', 'Wraith', 5, 'unlocated', 4, 4),
-('Whisper-in-Walls', 'Poltergeist', 3, 'unlocated', 2, 2),
-('Ignis the Scorched', 'Wraith', 7, 'unlocated', 15, 5),
-('Cthulian Scout', 'Vampire', 6, 'unlocated', 10, 6),
-('Titania''s Shadow', 'Wraith', 8, 'unlocated', 3, 7),
-('Unit 734-Omega', 'Poltergeist', 9, 'unlocated', 8, 8),
-('The Weeping Lady', 'Wraith', 7, 'unlocated', 6, 2),
-('Goliath Prime', 'Vampire', 9, 'unlocated', 12, 3),
-('Silas the Flayer', 'Vampire', 9, 'unlocated', 6, 1),
-('Abyssal Leviathan', 'Wraith', 10, 'unlocated', 10, 6),
-('Chernobog Aspect', 'Wraith', 9, 'unlocated', 14, 4),
-('The Skinwalker', 'Vampire', 6, 'unlocated', 11, 7),
-('Astro-Lich Kel''Thuz', 'Wraith', 10, 'unlocated', 9, 4),
-('Yeti King', 'Wraith', 7, 'unlocated', 7, 2),
-('Automaton Zeta', 'Poltergeist', 6, 'unlocated', 5, 8),
-('Blood-Baron Vane', 'Vampire', 7, 'unlocated', 13, 1),
-('Magma Wyrm', 'Vampire', 9, 'unlocated', 12, 5),
-('Void-Spawn Alpha', 'Wraith', 8, 'unlocated', 9, 4),
-('The Rat King', 'Poltergeist', 5, 'unlocated', 8, 6),
-('Eldritch Eye', 'Poltergeist', 8, 'unlocated', 13, 4);
+-- Hub: Aether Lab 4 (Location 5) - The "5-and-5" synchronized zone
+('Xylo-Thul', 'Wraith', 10, 'unlocated', 5, 4),        -- Weakness: Dimensional Anchoring (Art 2)
+('Morana Prime', 'Wraith', 9, 'unlocated', 5, 4),       -- Weakness: Endothermic Shock (Art 5)
+('Glacia', 'Wraith', 6, 'unlocated', 5, 2),             -- Weakness: Soul Shredding (Art 14)
+('The Lab-Stalker', 'Wraith', 7, 'unlocated', 5, 4),    -- Weakness: Molecular Agitation (Art 15)
+('Alpha Poltergeist', 'Poltergeist', 8, 'unlocated', 5, 8), -- Weakness: Physical Manifestation (Art 4)
 
+-- Other Synchronized Locations
+('Valerius the Cruel', 'Vampire', 8, 'unlocated', 1, 1), -- Weakness: Solar Exposure (Art 1)
+('Unit 734-Omega', 'Poltergeist', 9, 'unlocated', 2, 8), -- Weakness: EM Pulse (Art 6)
+('Sector 7 Deserter', 'Vampire', 5, 'unlocated', 2, 1),  -- Weakness: Heart Piercing (Art 3)
+('Whisper-in-Walls', 'Poltergeist', 3, 'unlocated', 3, 2), -- Weakness: Salt-Circle (Art 4)
+('Automaton Zeta', 'Poltergeist', 6, 'unlocated', 8, 8),   -- Weakness: Thermal Sight (Art 13)
+('Eldritch Eye', 'Poltergeist', 8, 'unlocated', 8, 4),    -- Weakness: Thermal Sight (Art 13)
+('Astro-Lich Kel''Thuz', 'Wraith', 10, 'unlocated', 9, 4), -- Weakness: Gravity Well (Art 11 - Moved)
+('Abyssal Leviathan', 'Wraith', 10, 'unlocated', 10, 6),  -- Weakness: Ethereal Siphon (Art 8)
+('Cthulian Scout', 'Vampire', 6, 'unlocated', 10, 6),    -- Weakness: Iron Binding (Art 7 - Moved)
+('Goliath Prime', 'Vampire', 9, 'unlocated', 12, 3),     -- Weakness: Iron Binding (Art 7)
+('Blood-Baron Vane', 'Vampire', 7, 'unlocated', 13, 1),   -- Weakness: Ancient Bone (Art 12)
+('Ignis the Scorched', 'Wraith', 7, 'unlocated', 15, 5); -- Weakness: Molecular Agitation (Art 15)
 
 -- 4. ARTIFACTS (The Arsenal)
 INSERT INTO Artifacts (artifact_name, artifact_type, origin, location_id, status) VALUES 
-('Sun-Forged Blade', 'Weapon', 'Solar Forge', 1, 'Unlocated'),         
-('Void Anchor', 'Relic', 'The Far Realm', 5, 'Unlocated'),         
-('Silver Stake', 'Tool', 'Vanguard Labs', 2, 'Unlocated'),              
-('Iron-Salt Urn', 'Utility', 'Old World', 3, 'Unlocated'),             
-('Cryo-Blaster MK IV', 'Weapon', 'Aether Labs', 5, 'Unlocated'),        
-('EMP Grenade', 'Utility', 'Sector 7', 2, 'Unlocated'),                 
-('Cold-Iron Shackles', 'Tool', 'The Crucible', 12, 'Unlocated'),      
-('Abyssal Pearl', 'Relic', 'Ocean Floor', 10, 'Unlocated'),            
-('Lead-Lined Amulet', 'Charm', 'Chernobyl', 14, 'Unlocated'),           
-('Banshee''s Gag', 'Tool', 'Blackwood', 6, 'Unlocated'),                
-('Null-Gravity Field', 'Utility', 'Orbital Station', 9, 'Unlocated'),  
-('Dragon-Bone Spear', 'Weapon', 'Hollow Earth', 13, 'Unlocated'),      
-('True-Sight Goggles', 'Tool', 'Neo-Tokyo', 8, 'Unlocated'),            
-('Phylactery Breaker', 'Weapon', 'Catacombs', 4, 'Unlocated'),         
-('Thermal Lance', 'Weapon', 'Glass Desert', 15, 'Unlocated');         
+('Sun-Forged Blade', 'Weapon', 'Solar Forge', 1, 'Active'),      -- Vampire Slasher
+('Void Anchor', 'Relic', 'The Far Realm', 5, 'Active'),          -- Wraith Anchor
+('Silver Stake', 'Tool', 'Vanguard Labs', 2, 'Active'),           -- Vampire Stake
+('Iron-Salt Urn', 'Utility', 'Old World', 5, 'Active'),           -- Poltergeist/Wraith Trap (Moved to Loc 5)
+('Cryo-Blaster MK IV', 'Weapon', 'Aether Labs', 5, 'Active'),     -- Wraith Freezer
+('EMP Grenade', 'Utility', 'Sector 7', 2, 'Active'),               -- Poltergeist Disrupter
+('Cold-Iron Shackles', 'Tool', 'The Crucible', 10, 'Active'),     -- Vampire Binder (Moved to Loc 10)
+('Abyssal Pearl', 'Relic', 'Ocean Floor', 10, 'Active'),          -- Wraith Siphon
+('Lead-Lined Amulet', 'Charm', 'Chernobyl', 14, 'Active'),         -- Wraith Shield
+('Banshee''s Gag', 'Tool', 'Blackwood', 6, 'Active'),             -- Poltergeist Mute
+('Null-Gravity Field', 'Utility', 'Orbital Station', 9, 'Active'), -- Wraith/Vampire (Moved to Loc 9)
+('Dragon-Bone Spear', 'Weapon', 'Hollow Earth', 13, 'Active'),    -- Vampire Regenerator Killer
+('True-Sight Goggles', 'Tool', 'Neo-Tokyo', 8, 'Active'),         -- Poltergeist Tracker
+('Phylactery Breaker', 'Weapon', 'Catacombs', 5, 'Active'),       -- Wraith Soul Shredder (Moved to Loc 5)
+('Thermal Lance', 'Weapon', 'Glass Desert', 5, 'Active');         -- Wraith Heat Lance (Moved to Loc 5)      
 
 
 -- 5. WEAKNESSES (The Tactical Data)
@@ -113,4 +107,9 @@ INSERT INTO Hunters (hunter_name, rank, type, faction) VALUES
 ('Finn "Fish" Waters', 'Rookie', 'Collector', 'Aegis Core'),
 ('Reaper-7', 'Master', 'Attacker', 'The Iron Syndicate');
 
-select * from "Entities"
+-- 7
+
+INSERT INTO PenaltyTypes (penalty_type, description) VALUES
+('ArtifactLost',      'A discovered artifact is reset back to Unlocated status.'),
+('EntitySpawned',     'A new entity is generated by combining attributes of existing entities.'),
+('EntityResurrected', 'A neutralized entity is restored to active and its artifact Wasted.');
