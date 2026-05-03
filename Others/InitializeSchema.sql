@@ -1,12 +1,15 @@
+EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT ALL";
+
 DROP TABLE IF EXISTS Operations;
-DROP TABLE IF EXISTS Hunter_Abilities;
-DROP TABLE IF EXISTS Abilities;
 DROP TABLE IF EXISTS Weaknesses;
 DROP TABLE IF EXISTS Artifacts;
 DROP TABLE IF EXISTS Hunters;
 DROP TABLE IF EXISTS Entities;
 DROP TABLE IF EXISTS Locations;
 DROP TABLE IF EXISTS Bloodlines;
+DROP TABLE IF EXISTS Penalties;
+DROP TABLE IF EXISTS PenaltyTypes;
+DROP TABLE IF EXISTS Decryption_Attempts;
 
 CREATE TABLE Bloodlines (
     bloodline_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -102,7 +105,40 @@ CREATE TABLE Operations (
 );
 
 
+CREATE TABLE Decryption_Attempts (
+    attempt_id    INT IDENTITY(1,1) PRIMARY KEY,
+    hunter_id     INT NOT NULL,
+    attempts_used INT DEFAULT 0,
+    current_shift INT,
+    last_attempt  DATETIME,
+    locked_until  DATETIME,
+    encrypted_text VARCHAR(200),
+    entity_species VARCHAR(50),
+    FOREIGN KEY (hunter_id) REFERENCES Hunters(hunter_id) ON DELETE CASCADE
+);
 
+
+CREATE TABLE Penalties (
+    penalty_id          INT IDENTITY(1,1) PRIMARY KEY,
+    hunter_id           INT NOT NULL,
+    penalty_type        VARCHAR(50) NOT NULL,
+    penalty_description VARCHAR(MAX),
+    affected_id         INT,
+    penalty_date        DATETIME DEFAULT GETDATE(),
+    CONSTRAINT CHK_PenaltyType CHECK (penalty_type IN (
+        'ArtifactLost',
+        'EntitySpawned',
+        'EntityResurrected'
+    )),
+    FOREIGN KEY (hunter_id) REFERENCES Hunters(hunter_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE PenaltyTypes (
+    penalty_type_id INT IDENTITY(1,1) PRIMARY KEY,
+    penalty_type    VARCHAR(50) NOT NULL,
+    description     VARCHAR(MAX)
+);
 
 
 

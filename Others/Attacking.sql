@@ -107,3 +107,12 @@ BEGIN
     set artifact_id  = @artifact_id
     where session_id = @sessionid
 END;
+
+
+
+
+
+
+
+
+

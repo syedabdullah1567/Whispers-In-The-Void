@@ -17,7 +17,12 @@ import EntityRegistry from './EntityRegistry';
 import ArtifactVault from './ArtifactVault';
 import OpsLog from './OperationLogs';
 import AttackingMission from './AttackingMission'; 
-import { WeaknessIntel } from './stubs';
+
+import WeaknessIntel from './WeaknessIntel'
+import WeaknessInitialize from './WeaknessInitialize'
+import WeaknessSpecies from './WeaknessSpecies'
+import WeaknessCipher from './WeaknessCipher'
+
 import './App.css';
 
 const AudioController = ({ horrorRef, dashboardRef, gameStarted }) => {
@@ -34,7 +39,13 @@ const AudioController = ({ horrorRef, dashboardRef, gameStarted }) => {
             "/hunters", 
             "/locations",
             "/scout-operation",
-            "/collect-operation"
+            "/collect-operation",
+            "/weaknesses",
+            "/weaknesses/initialize",
+            "/weaknesses/species",
+            "/weaknesses/cipher/Poltergeist",
+            "/weaknesses/cipher/Vampire",
+            "/weaknesses/cipher/Poltergeist"
         ];
         
         const isDashboardPath = dashboardPaths.includes(location.pathname);
@@ -81,7 +92,7 @@ export default function App() {
         <BrowserRouter>
             <div className="App">
                 {/* GLOBAL AUDIO SOURCES */}
-                <audio ref={horrorRef} src="/assets/audio/castlevania.mp3" loop />
+               /* <audio ref={horrorRef} src="/assets/audio/castlevania.mp3" loop /> */
                 <audio ref={dashboardRef} src="/assets/audio/nightmare.mp3" loop />
                 
                 {/* The brain that decides which music plays */}
@@ -114,7 +125,15 @@ export default function App() {
                     <Route path="/scout-operation" element={<DashboardLayout><ScoutingMission /></DashboardLayout>} />
                     <Route path="/collect-operation" element={<DashboardLayout><CollectionMission /></DashboardLayout>} />
                     <Route path="/attacker-gameplay" element={<AttackingMission />} />
-                    <Route path="*" element={<Navigate to="/" />} />
+                    <Route path="*" element={<Navigate to="/" />}/>
+                    
+                    {/* WEAKNESS INTEL */}
+                    <Route path="/weaknesses" element={<DashboardLayout><WeaknessIntel /></DashboardLayout>} />
+                    <Route path="/weaknesses/initialize" element={<WeaknessInitialize />} />
+                    <Route path="/weaknesses/species" element={<WeaknessSpecies />} />
+                    <Route path="/weaknesses/cipher/:species" element={<WeaknessCipher />} />
+       
+
                 </Routes>
             </div>
         </BrowserRouter>

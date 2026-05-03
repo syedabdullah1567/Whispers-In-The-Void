@@ -181,7 +181,7 @@ app.get('/api/entities', async (req, res) => {
 app.get("/api/dashboard/stats", async (req, res) => {
   try {
     // 1. Get the pool from the promise first
-    const pool = await poolPromise; 
+    const pool = await poolPromise;
 
     // 2. Use 'pool.request()' instead of calling poolPromise directly
     const result = await pool.request()
@@ -340,3 +340,89 @@ app.get('/api/locations/:locationId/entities', async (req, res) => {
         res.status(500).send(err.message);
     }
 });
+
+// WEAKNESS INTEL
+
+app.get('/api/weaknesses', async (req, res) => {
+  try {
+    const pool = await poolPromise
+    const result = await pool.request().query('SELECT * FROM Weaknesses')
+    res.json(result.recordset)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get('/api/penalties', async (req, res) => {
+  try {
+    const pool = await poolPromise
+    const result = await pool.request().query(`
+      SELECT P.*, H.hunter_name 
+      FROM Penalties P
+      JOIN Hunters H ON P.hunter_id = H.hunter_id
+      ORDER BY P.penalty_date DESC
+    `)
+    res.json(result.recordset)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.post('/api/weaknesses/generate', async (req, res) => {
+  try {
+    const { hunter_id, entity_species } = req.body
+    const pool = await poolPromise
+    const result = await pool.request()
+      .input('hunter_id', sql.Int, hunter_id)
+      .input('Entity_species', sql.VarChar(50), entity_species)
+      .execute('sp_GenerateShift')
+      
+    let data = {};
+    if (result.recordsets) {
+        result.recordsets.forEach(rs => {
+            if (rs && rs.length > 0) {
+                data = { ...data, ...rs[0] };
+            }
+        });
+    } else if (result.recordset && result.recordset.length > 0) {
+        data = { ...result.recordset[0] };
+    }
+    
+    // Also include any output parameters
+    if (result.output) {
+        data = { ...data, ...result.output };
+    }
+    
+    // If the procedure didn't return the shift, fetch it from the table
+    if (data.current_shift === undefined && data.shift === undefined && data.Shift === undefined && data.message === undefined) {
+      const shiftQuery = await pool.request()
+        .input('hunter_id', sql.Int, hunter_id)
+        .query('SELECT current_shift FROM Decryption_Attempts WHERE hunter_id = @hunter_id');
+      
+      if (shiftQuery.recordset && shiftQuery.recordset.length > 0) {
+        data.current_shift = shiftQuery.recordset[0].current_shift;
+      }
+    }
+    
+    console.log("Generate Shift Output Data:", data); // Helpful for debugging if user looks at terminal
+    res.json(data)
+  } catch (err) {
+    console.error("Error in generate:", err);
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.post('/api/weaknesses/decrypt', async (req, res) => {
+  try {
+    const { hunter_id, guess, entity_species } = req.body
+    const pool = await poolPromise
+    const result = await pool.request()
+      .input('hunter_id', sql.Int, hunter_id)
+      .input('UserGuess', sql.VarChar(50), guess)
+      .input('Entity_species', sql.VarChar(50), entity_species)
+      .execute('sp_CheckDecryption')
+    res.json(result.recordset[0])
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})

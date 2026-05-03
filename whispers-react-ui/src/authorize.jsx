@@ -188,7 +188,7 @@ const Authorize = () => {
                                             });
                                         } else {
                                             // Scouting and others go back to Command
-                                            navigate("/"); 
+                                            navigate("/dashboard"); 
                                         }
                                     } else {
                                         navigate("/hunter-select");
