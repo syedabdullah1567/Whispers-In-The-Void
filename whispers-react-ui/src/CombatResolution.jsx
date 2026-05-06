@@ -47,20 +47,17 @@ const CombatResolution = () => {
             <div className="scanline-overlay"></div>
 
             {/* HEADER DATA BARS */}
-            <header className="combat-header">
-                <div className="telemetry-box">
-                    <span className="label">OP_ID</span>
-                    <span className="value">{sessionId}</span>
-                </div>
-                <div className="telemetry-box">
-                    <span className="label">TARGET</span>
-                    <span className="value">{selectedEntity?.true_name || "UNKNOWN_ENTITY"}</span>
-                </div>
-                <div className="telemetry-box">
-                    <span className="label">PAYLOAD</span>
-                    <span className="value">{selectedArtifact?.["Artifact Name"] || "NONE"}</span>
-                </div>
-            </header>
+          <header className="combat-header">
+    <div className="telemetry-box">
+        <span className="label">OP_ID</span>
+        <span className="value">{sessionId}</span>
+    </div>
+
+    <div className="telemetry-box">
+        <span className="label">PAYLOAD</span>
+        <span className="value">{selectedArtifact?.["Artifact Name"] || "NONE"}</span>
+    </div>
+</header>
 
             <main className="combat-viewport">
                 {!combatResult && !isEngaging && (
@@ -85,38 +82,40 @@ const CombatResolution = () => {
                         </div>
                     </div>
                 )}
-
-                {combatResult && (
-                    <div className={`outcome-module ${isVictory ? 'success-ui' : 'failure-ui'}`}>
-                        <div className="outcome-header">
-                            <h1 className="outcome-text">{combatResult.Result}</h1>
-                        </div>
-                        
-                        <div className="report-body">
-                            <div className="stat-grid">
-                                <div className="stat-item">
-                                    <span className="stat-label">SURVIVAL_PROBABILITY</span>
-                                    <span className="stat-value">{(combatResult.Win_Probability * 100).toFixed(2)}%</span>
-                                </div>
-                                <div className="stat-item">
-                                    <span className="stat-label">LOCATION_STABILITY</span>
-                                    <span className="stat-value">CRITICAL</span>
-                                </div>
-                            </div>
-                            
-                            <div className="report-text-box">
-                                <p className="report-label">DEBRIEF_LOG:</p>
-                                <p className="report-msg">{combatResult.Message}</p>
-                            </div>
-                        </div>
-
-                        <button className="base-return-btn" onClick={() => navigate('/dashboard')}>
-                            RETURN TO COMMAND BASE
-                        </button>
+{combatResult && (
+        <div className={`outcome-module ${isVictory ? 'success-ui' : 'failure-ui'}`}>
+            <div className="outcome-header">
+                <h1 className="outcome-text">{combatResult.Result}</h1>
+            </div>
+            
+            <div className="report-body">
+                <div className="stat-grid">
+                    <div className="stat-item">
+                        <span className="stat-label">SURVIVAL_PROBABILITY</span>
+                        <span className="stat-value">{(combatResult.Win_Probability * 100).toFixed(2)}%</span>
                     </div>
-                )}
-            </main>
+                    <div className="stat-item">
+                        <span className="stat-label">LOCATION_STABILITY</span>
+                        <span className="stat-value">{isVictory ? "STABILIZING" : "CRITICAL"}</span>
+                    </div>
+                </div>
+                
+                <div className="report-text-box">
+                    <p className="report-label">DEBRIEF_LOG:</p>
+                    {/* FIX: Show DetailedMessage for success, fall back to standard Message */}
+                    <p className="report-msg">
+                        {combatResult.DetailedMessage || combatResult.Message}
+                    </p>
+                </div>
+            </div>
 
+            <button className="base-return-btn" onClick={() => navigate('/dashboard')}>
+                RETURN TO COMMAND BASE
+            </button>
+        </div>
+    )}
+</main>
+                
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@600;700&display=swap');
 
