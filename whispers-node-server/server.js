@@ -305,16 +305,22 @@ app.post('/api/combat/assign-entity', async (req, res) => {
 });
 
 // 3. GET ARTIFACTS (Artifact Loadout)
-app.get('/api/gameplay/artifacts/:sessionId', async (req, res) => {
+app.get('/api/artifacts/:locationId', async (req, res) => {
     try {
-        const pool = await poolPromise;
-        const result = await pool.request()
-            .input('SessionID', sql.Int, req.params.sessionId)
-            .execute('Get_Artifacts_At_Location_GamsPlay'); // <--- Matches Procedure 3
-            
-        res.json(result.recordset);
+        const pool = await poolPromise; 
+        const locId = parseInt(req.params.locationId);
+        let result = await pool.request()
+            .input('LocationID', sql.Int, locId)
+            .execute('Get_Artifacts_At_Location'); 
+        
+        // Use result.recordset (singular) for the primary data rows
+        const data = result.recordset; 
+
+        console.log("Sending to React:", data);
+        res.json(data);
     } catch (err) {
-        res.status(500).send(err.message);
+        console.error(err);
+        res.status(500).send({ error: err.message });
     }
 });
 
@@ -345,19 +351,28 @@ app.post('/api/combat/launch', async (req, res) => {
             .input('SessionID', sql.Int, sessionId)
             .execute('LaunchAttack');
             
-        // Now that the extra SELECT is gone, the data is in recordset (singular)
-        // We use result.recordset[0] which is the first row of the first table
+        // Get the first row of the first recordset
         const combatData = result.recordset[0];
-        
-        console.log("Mission Outcome:", combatData.Result);
+
+        if (!combatData) {
+            return res.status(404).json({ success: false, error: "SESSION_NOT_FOUND" });
+        }
+
+        // Log for debugging
+        console.log(`Mission ${sessionId} Outcome:`, combatData.Result);
+
+        // Send the data back to the frontend
         res.json(combatData); 
         
     } catch (err) {
         console.error("COMBAT_EXECUTION_ERROR:", err);
-        res.status(500).send("Error launching attack");
+        res.status(500).json({ 
+            success: false, 
+            error: "STRIKE_SEQUENCE_INTERRUPTED",
+            details: err.message 
+        });
     }
 });
-
 
 // WEAKNESS INTEL
 
