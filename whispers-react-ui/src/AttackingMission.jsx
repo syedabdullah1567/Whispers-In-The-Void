@@ -151,7 +151,7 @@ const AttackingMission = () => {
                                     <span className="entity-id-label">ENTITY_ID_{ent.entity_id}</span>
                                 </div>
                                 <div className="card-body">
-                                    <h2 className="entity-name-display">{ent.true_name}</h2>
+                                    <h2 className="entity-name-display">{ent.entity_name}</h2>
                                     <div className="entity-meta">
                                         <p>LOCATION: {location?.location_name}</p>
                                         <p>BLOODLINE: {ent.bloodline_name || 'CLASSIFIED'}</p>
@@ -159,10 +159,10 @@ const AttackingMission = () => {
                                     <div className="terror-index-container">
                                         <div className="terror-label-row">
                                             <span>TERROR INDEX</span>
-                                            <span>{ent.terror_index}/10</span>
+                                            <span>{ent.threat_level}/10</span>
                                         </div>
                                         <div className="terror-bar">
-                                            <div className="terror-fill" style={{ width: `${(ent.terror_index / 10) * 100}%` }}></div>
+                                            <div className="terror-fill" style={{ width: `${(ent.threat_level / 10) * 100}%` }}></div>
                                         </div>
                                     </div>
                                     <div className="card-footer-row">
