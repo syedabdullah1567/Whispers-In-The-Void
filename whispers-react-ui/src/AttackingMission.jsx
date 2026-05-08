@@ -18,6 +18,8 @@ const AttackingMission = () => {
     
     // Data State
     const { location, sessionId, hunter } = state || {};
+    console.log("STATE RECEIVED:", state);
+    console.log("SESSION ID:", sessionId);
     const [entities, setEntities] = useState([]);
     const [artifacts, setArtifacts] = useState([]);
     const [selectedEntity, setSelectedEntity] = useState(null);
@@ -52,22 +54,30 @@ const AttackingMission = () => {
     // 2. Lock Target Logic
     const handleLockTarget = async (entity) => {
         try {
-            await axios.post('http://localhost:3000/api/combat/assign-entity', {
-                sessionId: Number(sessionId),
-                entityId: Number(entity.entity_id),
-                locationId: Number(location.location_id)
-            });
+           await axios.post('http://localhost:3000/api/combat/assign-entity', {
+            sessionId: parseInt(sessionId),
+            entityId: parseInt(entity.entity_id),
+            locationId: parseInt(location.location_id)
+        });
+        setSelectedEntity(entity);
+        toast.success(`TARGET_LOCKED: ${entity.entity_name}`);
             
-            setSelectedEntity(entity);
-            toast.success(`TARGET_LOCKED: ${entity.true_name}`);
+          if (!sessionId) {
+            toast.error("SESSION_ID_MISSING: CANNOT FETCH ARTIFACTS");
+            return;
+        }
             
             // Switch to Artifact Vault after locking target
-            const artRes = await axios.get(`http://localhost:3000/api/gameplay/artifacts/${sessionId}`);
+            const artRes = await axios.get(`http://localhost:3000/api/gamesplay/artifacts/${sessionId}`);
             // Filter to only 'Active' (usable) artifacts for combat
+            if (artRes.data) {
             const usableArtifacts = artRes.data.filter(art => art["Current Status"] === 'Active');
             setArtifacts(usableArtifacts);
             setView('artifact');
+        }
+            
         } catch (err) {
+            console.error("LOCK TARGET ERROR:", err);
             toast.error("DATABASE_LINK_FAILURE: TARGET NOT REGISTERED");
         }
     };

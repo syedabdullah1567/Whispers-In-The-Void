@@ -83,7 +83,12 @@ const Authorize = () => {
                     });
 
                     // This will now successfully receive the ID from the server
-                    finalData.combatSessionId = sessionRes.data.sessionId;
+                   // Change this:
+finalData.combatSessionId = sessionRes.data.sessionId;
+
+    // Add a console.log to verify what you're actually getting:
+    console.log("FULL SESSION RESPONSE:", sessionRes.data);
+    console.log("SESSION ID CAPTURED:", sessionRes.data.sessionId);
                     finalData.message += " // COMBAT_SESSION_ACTIVE";
                     
                     console.log("Combat Session Initialized ID:", finalData.combatSessionId);
@@ -184,8 +189,9 @@ const Authorize = () => {
                                             navigate("/attacker-gameplay", { 
                                                 state: { 
                                                     hunter, 
-                                                    location, 
-                                                    sessionId: authResult.combatSessionId // Using the ID we just generated
+                                                    location,
+                                                    sessionId: authResult.combatSessionId 
+                                                    
                                                 } 
                                             });
                                         } else {

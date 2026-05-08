@@ -6,24 +6,20 @@ const OperationLogs = () => {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchLogs = async () => {
-            try {
-                const response = await axios.get("http://localhost:3000/api/operation-log");
-                if (response.data.success) {
-                    setLogs(response.data.operationData);
-                } else {
-                    setLogs(response.data);
-                }
-            } catch (error) {
-                console.error("UPLINK ERROR: FAILED TO RETRIEVE OPERATIONAL HISTORY", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchLogs();
-    }, []);
-
+  useEffect(() => {
+    const fetchLogs = async () => {
+        try {
+            const response = await axios.get("http://localhost:3000/api/operation-log");
+            // ✅ Backend returns plain array, not {success, operationData}
+            setLogs(Array.isArray(response.data) ? response.data : []);
+        } catch (error) {
+            console.error("UPLINK ERROR:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchLogs();
+}, []);
     if (loading) return (
         <div className="main-content">
             <div className="glitch-text" style={{ color: '#ba7517', textAlign: 'center', marginTop: '20%' }}>

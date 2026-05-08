@@ -4,7 +4,7 @@ const config = {
   user: 'sa',
   password: 'SqlPass123!',
   server: 'localhost',
-  database: 'Whispers in the Void',
+  database: 'Whispers in the Voiddd',
   port: 1433,
   options: {
     encrypt: false,
