@@ -44,24 +44,7 @@ app.get("/api/locations", async(req, res) => {
     }
 });
 
-app.get('/api/artifacts/:locationId', async (req, res) => {
-    try {
-        const pool = await poolPromise; 
-        const locId = parseInt(req.params.locationId);
-        let result = await pool.request()
-            .input('LocationID', sql.Int, locId)
-            .execute('Get_Artifacts_At_Location'); 
-        
-        // Use result.recordset (singular) for the primary data rows
-        const data = result.recordset; 
 
-        console.log("Sending to React:", data);
-        res.json(data);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({ error: err.message });
-    }
-});
 
 app.get("/api/bloodlines", async(req, res) => {
     try {
@@ -109,7 +92,7 @@ app.post("/api/authorize", async (req, res) => {
 app.post("/api/missions/scout", async (req, res) => {
     // 1. Extract locationId (camelCase)
     const { locationId, hunterId } = req.body;
-
+console.log("SCOUT RECEIVED:", locationId, hunterId); 
     try {
         const pool = await poolPromise;
         
@@ -243,31 +226,6 @@ app.get('/api/operation-log', async(req, res) => {
 // ATTACKING SEQUENCE
 
 // NEW: INITIALIZE COMBAT SESSION
-app.post('/api/combat/start-session', async (req, res) => {
-    const { hunterId, locationId } = req.body;
-    try {
-        const pool = await poolPromise;
-        const result = await pool.request()
-            .input('EntityID', sql.Int, null) // Explicitly null as per your SP
-            .input('HunterID', sql.Int, hunterId)
-            .input('LocationID', sql.Int, locationId)
-            .output('sessionid', sql.Int) // Registers the output parameter
-            .execute('sp_starting_attack');
-        
-        // Grab the ID from the SELECT statement or the output param
-        const sessionId = result.recordset[0].SessionID;
-
-        console.log(`Combat Log Initialized: ID ${sessionId}`);
-        
-        res.status(200).json({
-            success: true,
-            sessionId: sessionId
-        });
-    } catch (err) {
-        console.error("SESSION_START_ERROR:", err);
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
 
 app.get('/api/locations/:locationId/entities', async (req, res) => {
     try {
@@ -304,17 +262,21 @@ app.post('/api/combat/assign-entity', async (req, res) => {
     }
 });
 
+
 // 3. GET ARTIFACTS (Artifact Loadout)
-app.get('/api/gameplay/artifacts/:sessionId', async (req, res) => {
+app.get('/api/gamesplay/artifacts/:sessionId', async (req, res) => {
     try {
-        const pool = await poolPromise;
+        const pool = await poolPromise; 
+        const sId = parseInt(req.params.sessionId);
+        
         const result = await pool.request()
-            .input('SessionID', sql.Int, req.params.sessionId)
-            .execute('Get_Artifacts_At_Location_GamsPlay'); // <--- Matches Procedure 3
-            
+            .input('SessionID', sql.Int, sId) // Updated to match SP param
+            .execute('Get_Artifacts_At_Location_GamsPlay'); // Updated to match new SP name
+        
         res.json(result.recordset);
     } catch (err) {
-        res.status(500).send(err.message);
+        console.error("ARTIFACT_FETCH_ERROR:", err);
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -335,7 +297,32 @@ app.post('/api/combat/confirm-loadout', async (req, res) => {
         res.status(500).send("Error confirming loadout");
     }
 });
+app.post('/api/combat/start-session', async (req, res) => {
+    // 1. Check if these are arriving correctly from React
+    const { hunterId, locationId } = req.body;
 
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('EntityID', sql.Int, null) // SP requires this
+            .input('HunterID', sql.Int, hunterId)
+            .input('LocationID', sql.Int, locationId)
+            .output('sessionid', sql.Int) 
+            .execute('sp_starting_attack');
+        
+        // 2. Check the SP result. 
+        // If your SP uses 'SELECT @sessionid as SessionID', use result.recordset[0].SessionID
+        const sId = result.recordset[0].SessionID || result.output.sessionid;
+
+        res.status(200).json({
+            success: true,
+            sessionId: sId
+        });
+    } catch (err) {
+        console.error("SQL Error:", err.message);
+        res.status(500).send(err.message); // This sends the 500 error to React
+    }
+});
 // 5. LAUNCH ATTACK (You will need this for your /combat-resolution screen!)
 app.post('/api/combat/launch', async (req, res) => {
     const { sessionId } = req.body;
@@ -345,20 +332,43 @@ app.post('/api/combat/launch', async (req, res) => {
             .input('SessionID', sql.Int, sessionId)
             .execute('LaunchAttack');
             
-        // Now that the extra SELECT is gone, the data is in recordset (singular)
-        // We use result.recordset[0] which is the first row of the first table
+        // Get the first row of the first recordset
         const combatData = result.recordset[0];
-        
-        console.log("Mission Outcome:", combatData.Result);
+
+        if (!combatData) {
+            return res.status(404).json({ success: false, error: "SESSION_NOT_FOUND" });
+        }
+
+        // Log for debugging
+        console.log(`Mission ${sessionId} Outcome:`, combatData.Result);
+
+        // Send the data back to the frontend
         res.json(combatData); 
         
     } catch (err) {
         console.error("COMBAT_EXECUTION_ERROR:", err);
-        res.status(500).send("Error launching attack");
+        res.status(500).json({ 
+            success: false, 
+            error: "STRIKE_SEQUENCE_INTERRUPTED",
+            details: err.message 
+        });
     }
 });
 
-
+// Add this to server.js
+app.get('/api/artifacts/:locationId', async (req, res) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('LocationID', sql.Int, parseInt(req.params.locationId))
+            .execute('Get_Artifacts_At_Location');
+        
+        res.json(result.recordset);
+    } catch (err) {
+        console.error("ARTIFACT_VAULT_ERROR:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
 // WEAKNESS INTEL
 
 app.get('/api/weaknesses', async (req, res) => {

@@ -27,28 +27,36 @@ const ScoutingMission = () => {
         fetchSectors();
     }, []);
 
-    const initiateScouting = async (locationID) => {
-    setStatus('SCANNING');
+const initiateScouting = async (locationID) => {
+    // ✅ Guard against missing hunter
+    if (!activeHunter?.hunter_id) {
+        setStatus('ERROR');
+        console.error("NO_HUNTER_IN_STATE: Navigation state missing hunter data");
+        return;
+    }
     
-        try {
-            const response = await axios.post('http://localhost:3000/api/missions/scout', { 
-                locationId: locationID,
-                hunterId: activeHunter.hunter_id 
-            });
+    setStatus('SCANNING');
+    try {
+        const response = await axios.post('http://localhost:3000/api/missions/scout', { 
+            locationId: locationID,
+            hunterId: activeHunter.hunter_id 
+        });
 
-            if (response.data.success) {
-                setStatus('SUCCESS');
-                
-                // FIX: Re-fetch locations/artifacts immediately after success
-                const refresh = await axios.get("http://localhost:3000/api/locations");
-                setLocations(refresh.data.locationData || refresh.data);
-
-                setTimeout(() => setStatus('IDLE'), 3000);
-            }
-        } catch (error) {
+        if (response.data.success) {
+            setStatus('SUCCESS');
+            const refresh = await axios.get("http://localhost:3000/api/locations");
+            setLocations(refresh.data.locationData || refresh.data);
+            setTimeout(() => setStatus('IDLE'), 3000);
+        } else {
+            // ✅ Handle false success
             setStatus('ERROR');
-        }   
-    };
+            console.error("SCOUT_FAILED:", response.data.message);
+        }
+    } catch (error) {
+        console.error("SCOUT_ERROR:", error.response?.data || error.message);
+        setStatus('ERROR');
+    }   
+};
 
     if (loading) return <div className="glitch-text" style={{textAlign: 'center', marginTop: '20%'}}>LOCALIZING SECTORS...</div>;
 
