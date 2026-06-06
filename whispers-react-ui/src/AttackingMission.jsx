@@ -24,6 +24,7 @@ const AttackingMission = () => {
     const [artifacts, setArtifacts] = useState([]);
     const [selectedEntity, setSelectedEntity] = useState(null);
     const [selectedArtifact, setSelectedArtifact] = useState(null);
+    const [isLocking, setIsLocking] = useState(false); // ← add here
 
     // 1. Splash Screen & Initial Data Fetch
     useEffect(() => {
@@ -53,6 +54,8 @@ const AttackingMission = () => {
 
     // 2. Lock Target Logic
     const handleLockTarget = async (entity) => {
+        if (isLocking) return; // prevent double click
+        setIsLocking(true);
         try {
            await axios.post('http://localhost:3000/api/combat/assign-entity', {
             sessionId: parseInt(sessionId),
@@ -79,6 +82,9 @@ const AttackingMission = () => {
         } catch (err) {
             console.error("LOCK TARGET ERROR:", err);
             toast.error("DATABASE_LINK_FAILURE: TARGET NOT REGISTERED");
+        }
+        finally {
+            setIsLocking(false); // ← ADD
         }
     };
 
